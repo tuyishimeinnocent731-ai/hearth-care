@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HeartPulseIcon, SearchIcon, BellIcon, UserCircleIcon, SettingsIcon, LogOutIcon, ChevronDownIcon, MenuIcon } from './IconComponents';
+import type { UserProfile } from '../types';
+import type { Page } from '../App';
 
 interface HeaderProps {
     searchQuery: string;
     onSearchChange: (query: string) => void;
     onToggleMobileNav: () => void;
+    userProfile: UserProfile;
+    onNavigate: (page: Page) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onToggleMobileNav }) => {
+const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onToggleMobileNav, userProfile, onNavigate }) => {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -28,6 +32,11 @@ const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onToggleMo
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    const handleMenuClick = (page: Page) => {
+      onNavigate(page);
+      setUserMenuOpen(false);
+    }
 
   return (
     <header className="bg-blue-600 text-white fixed top-0 left-0 right-0 z-20 lg:left-72 lg:right-80">
@@ -109,18 +118,18 @@ const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onToggleMo
               >
                 <span className="sr-only">Fungura menu y'ukoresha</span>
                 <img
-                  className="h-9 w-9 rounded-full"
-                  src="https://picsum.photos/seed/user/200/200"
+                  className="h-9 w-9 rounded-full object-cover"
+                  src={userProfile.profilePicture}
                   alt="Ifoto y'ukoresha"
                 />
                 <ChevronDownIcon className="w-4 h-4 ml-1 text-gray-500" />
               </button>
               {userMenuOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a href="#" onClick={(e) => { e.preventDefault(); handleMenuClick('profile'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <UserCircleIcon className="w-5 h-5 mr-2" /> Umwirondoro
                     </a>
-                     <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                     <a href="#" onClick={(e) => { e.preventDefault(); handleMenuClick('settings'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <SettingsIcon className="w-5 h-5 mr-2" /> Igenamiterere
                     </a>
                     <a href="#" className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">

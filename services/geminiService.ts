@@ -1,6 +1,6 @@
 // FIX: Implement Gemini service with correct API usage
 import { GoogleGenAI, Type } from "@google/genai";
-import type { Doctor, Message } from '../types';
+import type { Doctor, Message, UserProfile } from '../types';
 
 if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
@@ -51,7 +51,8 @@ const fileToGenerativePart = async (file: File) => {
 export const getAIHealthAdvice = async (
     newMessage: string,
     history: Message[],
-    file: File | null
+    file: File | null,
+    userProfile: UserProfile
 ): Promise<string> => {
     try {
         const chatHistory = formatChatHistory(history);
@@ -64,6 +65,14 @@ export const getAIHealthAdvice = async (
             userParts.push(filePart);
         }
 
+        const profileContext = `### CONTEXT: USER'S HEALTH PROFILE
+- **Allergies**: ${userProfile.allergies.join(', ') || 'None reported'}
+- **Chronic Conditions**: ${userProfile.chronicConditions.join(', ') || 'None reported'}
+- **Past Surgeries**: ${userProfile.pastSurgeries.join(', ') || 'None reported'}
+- **Lifestyle**: Smoking: ${userProfile.lifestyle.smokingStatus}, Alcohol: ${userProfile.lifestyle.alcoholConsumption}.
+- **NOTE**: This information is critical. Tailor your advice and analysis based on this user's specific health background. For example, if they have a reported allergy, ensure your recommendations do not include that allergen.
+`;
+
 
         const response = await ai.models.generateContent({
             model: model,
@@ -72,7 +81,9 @@ export const getAIHealthAdvice = async (
                 { role: 'user', parts: userParts }
             ],
             config: {
-                systemInstruction: `You are 'Umujyanama wa AI,' a world-class AI medical analysis system from MediConnect AI. Your mission is to provide the most accurate, detailed, and safe preliminary health analysis and advice possible based on the user's text, voice transcriptions, and visual media (images/videos). You must communicate in expert-level, clear, and empathetic Kinyarwanda.
+                systemInstruction: `${profileContext}
+
+You are 'Umujyanama wa AI,' a world-class AI medical analysis system from MediConnect AI. Your mission is to provide the most accurate, detailed, and safe preliminary health analysis and advice possible based on the user's text, voice transcriptions, and visual media (images/videos). You must communicate in expert-level, clear, and empathetic Kinyarwanda.
 
 ### CORE DIRECTIVES:
 

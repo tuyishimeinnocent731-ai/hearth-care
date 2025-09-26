@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Doctor, Message } from './types';
+import type { Doctor, Message, UserProfile } from './types';
 import { DOCTORS } from './constants';
 import Header from './components/Header';
 import LeftAside from './components/LeftAside';
@@ -16,9 +16,10 @@ import AppointmentsPage from './pages/AppointmentsPage';
 import SettingsPage from './pages/SettingsPage';
 import VideoConsultationPage from './pages/VideoConsultationPage';
 import AIChatPage from './pages/AIChatPage';
+import ProfilePage from './pages/ProfilePage';
 
 
-export type Page = 'home' | 'messages' | 'prescriptions' | 'dashboard' | 'appointments' | 'settings' | 'video' | 'ai-chat';
+export type Page = 'home' | 'messages' | 'prescriptions' | 'dashboard' | 'appointments' | 'settings' | 'video' | 'ai-chat' | 'profile';
 type ChatStep = 'doctor-selection' | 'payment' | 'chat' | 'summary';
 
 const App: React.FC = () => {
@@ -30,6 +31,19 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    fullName: 'K. Nkurunziza',
+    email: 'nkurunziza.k@example.com',
+    phone: '+250 788 123 456',
+    dob: '1990-05-15',
+    location: 'Kigali, Rwanda',
+    profilePicture: 'https://picsum.photos/seed/user/200/200',
+    allergies: ['Penicillin', 'Peanuts'],
+    chronicConditions: ['Asthma'],
+    pastSurgeries: ['Appendectomy (2015)'],
+    emergencyContact: { name: 'G. Uwera', phone: '+250 788 654 321' },
+    lifestyle: { smokingStatus: 'Never', alcoholConsumption: 'Occasional' }
+  });
 
   const handleNavigate = (page: Page) => {
     setCurrentPage(page);
@@ -107,11 +121,13 @@ const App: React.FC = () => {
         case 'appointments':
             return <AppointmentsPage />;
         case 'settings':
-            return <SettingsPage />;
+            return <SettingsPage onNavigate={handleNavigate} />;
         case 'video':
             return <VideoConsultationPage onScheduleCall={openVideoModal}/>;
         case 'ai-chat':
-            return <AIChatPage />;
+            return <AIChatPage userProfile={userProfile} />;
+        case 'profile':
+            return <ProfilePage userProfile={userProfile} onUpdateProfile={setUserProfile} />;
         default:
             return renderConsultationFlow();
     }
@@ -124,6 +140,8 @@ const App: React.FC = () => {
           searchQuery={searchQuery} 
           onSearchChange={setSearchQuery} 
           onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
+          userProfile={userProfile}
+          onNavigate={handleNavigate}
         />
         
         <LeftAside 
@@ -131,6 +149,7 @@ const App: React.FC = () => {
           currentPage={currentPage}
           isMobileNavOpen={isMobileNavOpen}
           onCloseMobileNav={() => setIsMobileNavOpen(false)}
+          userProfile={userProfile}
         />
 
         <main className="min-h-screen pt-16 lg:ml-72 lg:mr-80">

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Page } from '../App';
-import { HomeIcon, UserCircleIcon, MessageSquareIcon, FileTextIcon, SettingsIcon, LogOutIcon, VideoIcon, ChartBarIcon, HeartPulseIcon, XIcon, CalendarIcon, BotIcon } from './IconComponents';
+import { HomeIcon, UserCircleIcon, MessageSquareIcon, FileTextIcon, SettingsIcon, LogOutIcon, VideoIcon, ChartBarIcon, HeartPulseIcon, XIcon, CalendarIcon, BotIcon, UserIcon } from './IconComponents';
+import type { UserProfile } from '../types';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -32,9 +33,10 @@ interface LeftAsideProps {
     currentPage: Page;
     isMobileNavOpen: boolean;
     onCloseMobileNav: () => void;
+    userProfile: UserProfile;
 }
 
-const LeftAside: React.FC<LeftAsideProps> = ({ onNavigate, currentPage, isMobileNavOpen, onCloseMobileNav }) => {
+const LeftAside: React.FC<LeftAsideProps> = ({ onNavigate, currentPage, isMobileNavOpen, onCloseMobileNav, userProfile }) => {
 
   const handleNavClick = (page: Page) => {
     onNavigate(page);
@@ -62,15 +64,15 @@ const LeftAside: React.FC<LeftAsideProps> = ({ onNavigate, currentPage, isMobile
       
       <div className="flex-1 overflow-y-auto p-4">
         <div className="flex items-center mb-6 px-2">
-            <img src="https://picsum.photos/seed/user/200/200" alt="User" className="w-11 h-11 rounded-full" />
+            <img src={userProfile.profilePicture} alt="User" className="w-11 h-11 rounded-full object-cover" />
             <div className="ml-3">
-                <p className="font-bold text-gray-800">K. Nkurunziza</p>
-                <p className="text-xs text-gray-500">nkurunziza.k@example.com</p>
+                <p className="font-bold text-gray-800">{userProfile.fullName}</p>
+                <p className="text-xs text-gray-500">{userProfile.email}</p>
             </div>
         </div>
         <nav className="space-y-2">
           <NavItem 
-            icon={<UserCircleIcon className="w-5 h-5" />} 
+            icon={<HomeIcon className="w-5 h-5" />} 
             label="Girana ikiganiro na Muganga" 
             active={currentPage === 'home'} 
             onClick={() => handleNavClick('home')} 
@@ -80,6 +82,12 @@ const LeftAside: React.FC<LeftAsideProps> = ({ onNavigate, currentPage, isMobile
             label="Umujyanama wa AI" 
             active={currentPage === 'ai-chat'}
             onClick={() => handleNavClick('ai-chat')}
+            />
+          <NavItem 
+            icon={<UserIcon className="w-5 h-5" />} 
+            label="Umwirondoro Wanjye" 
+            active={currentPage === 'profile'}
+            onClick={() => handleNavClick('profile')}
             />
           <NavItem 
             icon={<MessageSquareIcon className="w-5 h-5" />} 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { Message } from '../types';
+import type { Message, UserProfile } from '../types';
 import { BotIcon, SendIcon, UserCircleIcon, LightbulbIcon, AlertTriangleIcon, SmileIcon, ClipboardCheckIcon, HeartPulseIcon, ClipboardIcon, CheckIcon, PaperclipIcon, XIcon, MicrophoneIcon, VideoIcon } from '../components/IconComponents';
 import Spinner from '../components/Spinner';
 import { getAIHealthAdvice } from '../services/geminiService';
@@ -129,8 +129,11 @@ const SuggestedPrompts: React.FC<{ onPromptClick: (prompt: string) => void }> = 
     );
 };
 
+interface AIChatPageProps {
+  userProfile: UserProfile;
+}
 
-const AIChatPage: React.FC = () => {
+const AIChatPage: React.FC<AIChatPageProps> = ({ userProfile }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -231,7 +234,7 @@ const AIChatPage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const botResponseText = await getAIHealthAdvice(textToSend, updatedHistory, fileToSend);
+            const botResponseText = await getAIHealthAdvice(textToSend, updatedHistory, fileToSend, userProfile);
             const botMessage: Message = {
                 id: `ai-${Date.now()}`,
                 text: botResponseText,

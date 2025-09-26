@@ -30,3 +30,23 @@ export interface ConsultationSummaryData {
   }[];
   advice: string;
 }
+
+export interface UserProfile {
+  fullName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  location: string;
+  profilePicture: string; // URL
+  allergies: string[];
+  chronicConditions: string[];
+  pastSurgeries: string[];
+  emergencyContact: {
+    name: string;
+    phone: string;
+  };
+  lifestyle: {
+    smokingStatus: 'Never' | 'Former' | 'Current' | 'Not Specified';
+    alcoholConsumption: 'None' | 'Occasional' | 'Regular' | 'Not Specified';
+  };
+}
