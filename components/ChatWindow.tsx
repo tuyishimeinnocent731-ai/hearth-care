@@ -112,15 +112,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndC
   return (
     <div className="flex flex-col h-full max-h-[calc(100vh-4rem)] p-4 md:p-6">
        <div className="flex-shrink-0 pb-4 border-b border-gray-200">
-            <div className="flex items-center">
+            <div className="flex items-center flex-wrap gap-y-2">
                 <img src={doctor.imageUrl} alt={doctor.name} className="w-12 h-12 rounded-full" />
-                <div className="ml-4">
-                    <h2 className="text-xl font-bold text-gray-800">{doctor.name}</h2>
+                <div className="ml-4 flex-1 min-w-0">
+                    <h2 className="text-xl font-bold text-gray-800 truncate">{doctor.name}</h2>
                     <p className="text-sm text-gray-500">{doctor.specialty}</p>
                 </div>
-                <div className="ml-auto flex items-center gap-2">
-                    <button onClick={onVideoCall} className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200">
+                <div className="w-full sm:w-auto flex items-center justify-end gap-2">
+                    <button onClick={onVideoCall} className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition-colors">
                         <VideoIcon className="w-5 h-5" />
+                        <span className="sr-only">Start Video Call</span>
                     </button>
                     <button 
                       onClick={() => onEndConsultation(messages)}

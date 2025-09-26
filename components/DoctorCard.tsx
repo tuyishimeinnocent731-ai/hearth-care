@@ -26,14 +26,14 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onSelect }) => {
           </div>
         </div>
       </div>
-      <div className="mt-4 flex justify-between items-center">
+      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
         <div>
             <p className="text-sm text-gray-500">Ikiguzi</p>
             <p className="text-xl font-bold text-gray-800">{doctor.consultationFee.toLocaleString('rw-RW')} RWF</p>
         </div>
         <button
           onClick={() => onSelect(doctor)}
-          className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105"
+          className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105"
         >
           Tangira Ubujyanama
         </button>

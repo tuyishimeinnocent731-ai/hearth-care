@@ -57,12 +57,17 @@ export const sendSymptomDetails = async (
     try {
         const chatHistory = formatChatHistory(history);
         // FIX: Explicitly type userParts to allow both text and inlineData parts, resolving the TypeScript error.
-        const userParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [{ text: newMessage }];
+        const userParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [];
+
+        // FIX: Refactored userParts creation to be type-safe and avoid unsafe property access on a union type.
+        const textForPrompt = file
+            ? `Please analyze the attached media and consider it along with my message: ${newMessage}`
+            : newMessage;
+
+        userParts.push({ text: textForPrompt });
 
         if (file) {
             const filePart = await fileToGenerativePart(file);
-            // Add a contextual prompt for the image/video
-            userParts[0].text = `Please analyze the attached media and consider it along with my message: ${newMessage}`;
             userParts.push(filePart);
         }
 

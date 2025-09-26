@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const handleSelectDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
@@ -79,10 +80,26 @@ const App: React.FC = () => {
   return (
     <>
       <div className="flex flex-col h-screen bg-gray-100 font-sans">
-        <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <Header 
+          searchQuery={searchQuery} 
+          onSearchChange={setSearchQuery} 
+          onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
+        />
         <div className="flex flex-1 overflow-hidden">
-          <LeftAside onNavigateHome={handleStartNew} onVideoCall={openVideoModal} />
-          <main className="flex-1 overflow-y-auto bg-white">
+          <LeftAside 
+            onNavigateHome={handleStartNew} 
+            onVideoCall={openVideoModal}
+            isMobileNavOpen={isMobileNavOpen}
+            onCloseMobileNav={() => setIsMobileNavOpen(false)}
+          />
+          <main className="flex-1 overflow-y-auto bg-white relative">
+            {isMobileNavOpen && (
+              <div 
+                className="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden"
+                onClick={() => setIsMobileNavOpen(false)}
+                aria-hidden="true"
+              ></div>
+            )}
             <div className="container mx-auto max-w-5xl">
               {renderContent()}
             </div>

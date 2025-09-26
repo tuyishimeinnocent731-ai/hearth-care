@@ -8,7 +8,7 @@ const RightAside: React.FC = () => {
         <div>
           <h3 className="font-bold text-gray-800 mb-4">Gahunda Ziteganyijwe</h3>
           <div className="space-y-4">
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 transition-shadow hover:shadow-md">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-full">
                         <CalendarIcon className="w-5 h-5 text-blue-600"/>
@@ -18,7 +18,7 @@ const RightAside: React.FC = () => {
                         <p className="text-xs text-gray-500">Uyu munsi, 3:00 PM</p>
                     </div>
                 </div>
-                 <button className="mt-2 w-full text-xs bg-blue-50 text-blue-700 py-1.5 rounded-md hover:bg-blue-100">Reba Ibindi</button>
+                 <button className="mt-2 w-full text-xs bg-blue-50 text-blue-700 py-1.5 rounded-md hover:bg-blue-100 transition-colors">Reba Ibindi</button>
             </div>
           </div>
         </div>
@@ -71,11 +71,11 @@ const RightAside: React.FC = () => {
         <div>
           <h3 className="font-bold text-gray-800 mb-4">Ibikorwa byihuse</h3>
            <div className="grid grid-cols-2 gap-3">
-               <button className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50">
+               <button className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50 transition-colors duration-200">
                    <PlusCircleIcon className="w-6 h-6 text-blue-600 mb-1"/>
                    <p className="text-xs font-semibold text-gray-700">Gufata Gahunda</p>
                </button>
-                <button className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50">
+                <button className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50 transition-colors duration-200">
                    <PillIcon className="w-6 h-6 text-green-600 mb-1"/>
                    <p className="text-xs font-semibold text-gray-700">Kongeresha Imiti</p>
                </button>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HomeIcon, UserCircleIcon, MessageSquareIcon, FileTextIcon, SettingsIcon, LogOutIcon, VideoIcon, ChartBarIcon } from './IconComponents';
+import { HomeIcon, UserCircleIcon, MessageSquareIcon, FileTextIcon, SettingsIcon, LogOutIcon, VideoIcon, ChartBarIcon, HeartPulseIcon, XIcon } from './IconComponents';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -29,19 +29,38 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, active, onClick }) => (
 interface LeftAsideProps {
     onNavigateHome: () => void;
     onVideoCall: () => void;
+    isMobileNavOpen: boolean;
+    onCloseMobileNav: () => void;
 }
 
-const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome, onVideoCall }) => {
+const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome, onVideoCall, isMobileNavOpen, onCloseMobileNav }) => {
     const [activeItem, setActiveItem] = useState('Shakisha Muganga');
 
     const handleNavClick = (label: string, action?: () => void) => {
         setActiveItem(label);
         action?.();
+        onCloseMobileNav(); // Always close mobile nav after an action
     };
 
   return (
-    <aside className="hidden md:flex w-72 bg-white border-r border-gray-200 p-4 flex-col">
-      <div className="flex flex-col h-full">
+    <aside className={`
+      w-72 bg-white border-r border-gray-200 
+      fixed inset-y-0 left-0 z-40
+      transform transition-transform duration-300 ease-in-out
+      md:relative md:translate-x-0
+      ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'}
+    `}>
+      <div className="flex flex-col h-full p-4">
+        <div className="md:hidden flex items-center justify-between mb-4">
+            <div className="flex items-center">
+                <HeartPulseIcon className="h-8 w-8 text-blue-600" />
+                <span className="ml-3 text-xl font-bold text-gray-800">MediConnect AI</span>
+            </div>
+            <button onClick={onCloseMobileNav} className="p-2 rounded-md hover:bg-gray-100">
+                <XIcon className="w-6 h-6 text-gray-500" />
+            </button>
+        </div>
+
         <div className="flex items-center mb-6 px-2">
             <img src="https://picsum.photos/seed/user/200/200" alt="User" className="w-11 h-11 rounded-full" />
             <div className="ml-3">
