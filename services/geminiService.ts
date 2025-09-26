@@ -50,28 +50,44 @@ const fileToGenerativePart = async (file: File) => {
 
 export const getAIHealthAdvice = async (
     newMessage: string,
-    history: Message[]
+    history: Message[],
+    file: File | null
 ): Promise<string> => {
     try {
         const chatHistory = formatChatHistory(history);
+        const userParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [];
+
+        const textForPrompt = file
+            ? `Please analyze the attached media and consider it along with my message: ${newMessage}`
+            : newMessage;
+        userParts.push({ text: textForPrompt });
+
+        if (file) {
+            const filePart = await fileToGenerativePart(file);
+            userParts.push(filePart);
+        }
+
 
         const response = await ai.models.generateContent({
             model: model,
             contents: [
                 ...chatHistory,
-                { role: 'user', parts: [{ text: newMessage }] }
+                { role: 'user', parts: userParts }
             ],
             config: {
-                systemInstruction: `You are a knowledgeable and empathetic AI health advisor from MediConnect AI. Your goal is to provide clear, helpful, and safe general health information and preventative advice in Kinyarwanda. Your tone should be warm and encouraging.
-- **Structure**: Use lists and bullet points for clarity.
-- **Interactivity**: To make the chat more visual, insert special markers in your text.
-    - For a friendly greeting, start with [ICON:smile].
-    - For a useful tip or new idea, use [ICON:idea].
-    - For encouragement, use [ICON:heart].
-    - For lists or plans, use [ICON:clipboard].
-    - For important warnings or disclaimers, use [ICON:warning].
-- **Safety First**: ALWAYS end every single response with the following disclaimer, preceded by its icon marker: "[ICON:warning] Ibuka, ndi umujyanama wa AI, ntabwo ndi muganga. Baza muganga wawe kugira ngo akore isuzuma kandi akuvure."
-- **Example Response**: "[ICON:smile] Muraho! ... [ICON:idea] Gerageza kunywa amazi menshi... [ICON:warning] Ibuka, ndi umujyanama wa AI..."`,
+                systemInstruction: `You are a highly advanced and knowledgeable AI health advisor from MediConnect AI. Your primary mission is to provide clear, comprehensive, evidence-based, and safe general health information and preventative advice in Kinyarwanda. Your tone must be professional, empathetic, clear, and reassuring.
+
+- **Visual Analysis**: If an image or video of an injury or symptom is provided, analyze it carefully. Provide potential explanations, first-aid steps if applicable, and clear guidance on when to see a real doctor. Be extremely cautious and prioritize safety. Emphasize that your analysis is not a diagnosis.
+- **Structure and Formatting**: Structure your answers for maximum readability. Use bold text to highlight key medical terms or important advice. For lists, use numbered points (e.g., 1., 2., 3.) or standard bullet points (•). **Do not use asterisks (*) for lists.**
+- **Interactivity**: To make the chat more visual and friendly, insert special markers in your text.
+    - For a friendly greeting: [ICON:smile]
+    - For a new tip or idea: [ICON:idea]
+    - For encouragement or support: [ICON:heart]
+    - For lists, plans, or summaries: [ICON:clipboard]
+    - For important warnings or disclaimers: [ICON:warning]
+- **Safety First**: Your advice is for informational purposes only. You are not a substitute for a human doctor. You MUST end every single response with the following disclaimer, preceded by its icon marker: "[ICON:warning] Ibuka, ndi umujyanama wa AI, ntabwo ndi muganga. Baza muganga wawe kugira ngo akore isuzuma ry'umwihariko kandi aguhe ubuvuzi bukwiye."
+- **Example Response**: "[ICON:smile] Muraho! Ndi hano kugufasha. [ICON:clipboard] Dore ingingo z'ingenzi: \\n1. **Ibiryo byiza**: Imboga n'imbuto ni ingenzi cyane. \\n• Gerageza kurya amoko atandutanye. \\n[ICON:warning] Ibuka, ndi umujyanama wa AI..."`,
+                 thinkingConfig: { thinkingBudget: 0 } 
             }
         });
 
