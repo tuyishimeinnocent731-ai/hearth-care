@@ -9,32 +9,71 @@ if (!process.env.API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 const model = 'gemini-2.5-flash';
 
+// FIX: Update function to handle attachments in chat history, providing full multi-modal context to the model.
 function formatChatHistory(messages: Message[]) {
     // Filter out system messages and format for the API
     return messages
         .filter(msg => msg.sender !== 'system')
-        .map(msg => ({
-            role: msg.sender === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.text }],
-        }));
+        .map(msg => {
+            const parts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [];
+            
+            if (msg.text) {
+                parts.push({ text: msg.text });
+            }
+
+            if (msg.attachment) {
+                const [header, data] = msg.attachment.data.split(',');
+                const mimeType = header.match(/:(.*?);/)?.[1] || 'application/octet-stream';
+                parts.push({ inlineData: { mimeType, data } });
+            }
+
+            return {
+                role: msg.sender === 'user' ? 'user' : 'model',
+                parts,
+            };
+        });
 }
+
+const fileToGenerativePart = async (file: File) => {
+    const base64EncodedDataPromise = new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+      reader.readAsDataURL(file);
+    });
+    return {
+      inlineData: {
+        data: await base64EncodedDataPromise,
+        mimeType: file.type,
+      },
+    };
+};
 
 export const sendSymptomDetails = async (
     newMessage: string,
     history: Message[],
-    doctor: Doctor
+    doctor: Doctor,
+    file: File | null
 ): Promise<string> => {
     try {
         const chatHistory = formatChatHistory(history);
+        // FIX: Explicitly type userParts to allow both text and inlineData parts, resolving the TypeScript error.
+        const userParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [{ text: newMessage }];
+
+        if (file) {
+            const filePart = await fileToGenerativePart(file);
+            // Add a contextual prompt for the image/video
+            userParts[0].text = `Please analyze the attached media and consider it along with my message: ${newMessage}`;
+            userParts.push(filePart);
+        }
 
         const response = await ai.models.generateContent({
             model: model,
             contents: [
                 ...chatHistory,
-                { role: 'user', parts: [{ text: newMessage }] }
+                { role: 'user', parts: userParts }
             ],
             config: {
-                systemInstruction: `You are Dr. ${doctor.name}, a ${doctor.specialty}. Respond to the user's symptoms in a helpful, professional, and empathetic manner. Speak in Kinyarwanda.`,
+                systemInstruction: `You are Dr. ${doctor.name}, a ${doctor.specialty}. Respond to the user's symptoms in a helpful, professional, and empathetic manner. If an image or video is provided, analyze it as part of your diagnosis. Speak in Kinyarwanda.`,
             }
         });
 

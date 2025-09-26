@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarIcon, UserIcon, HeartPulseIcon } from './IconComponents';
+import { CalendarIcon, UserIcon, HeartPulseIcon, PillIcon, ClockIcon, CheckCircleIcon, PlusCircleIcon } from './IconComponents';
 
 const RightAside: React.FC = () => {
   return (
@@ -20,54 +20,66 @@ const RightAside: React.FC = () => {
                 </div>
                  <button className="mt-2 w-full text-xs bg-blue-50 text-blue-700 py-1.5 rounded-md hover:bg-blue-100">Reba Ibindi</button>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                <div className="flex items-center space-x-3">
-                     <div className="p-2 bg-red-100 rounded-full">
-                        <CalendarIcon className="w-5 h-5 text-red-600"/>
+          </div>
+        </div>
+        
+        <div>
+            <h3 className="font-bold text-gray-800 mb-4">Intego Z'ubuzima</h3>
+            <div className="space-y-3">
+                <div>
+                    <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium text-gray-700">Kunywa Amazi</span>
+                        <span className="text-gray-500">6/8 Ibirahuri</span>
                     </div>
-                    <div>
-                        <p className="text-sm font-semibold text-gray-800">Dr. Evelyn Reed</p>
-                        <p className="text-xs text-gray-500">Nyakanga 28, 10:30 AM</p>
+                    <div className="w-full bg-blue-100 rounded-full h-1.5">
+                        <div className="bg-blue-500 h-1.5 rounded-full" style={{width: '75%'}}></div>
                     </div>
+                </div>
+                 <div>
+                    <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium text-gray-700">Intambwe</span>
+                        <span className="text-gray-500">4,521/10,000</span>
+                    </div>
+                    <div className="w-full bg-green-100 rounded-full h-1.5">
+                        <div className="bg-green-500 h-1.5 rounded-full" style={{width: '45%'}}></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+          <h3 className="font-bold text-gray-800 mb-4">Ibyo Kwibukwa ku miti</h3>
+          <div className="space-y-3">
+            <div className="flex items-center bg-white p-3 rounded-lg border">
+                <div className="p-2 bg-red-100 rounded-full"><PillIcon className="w-5 h-5 text-red-500"/></div>
+                <div className="ml-3 flex-1">
+                    <p className="text-sm font-semibold">Amoxicillin</p>
+                    <p className="text-xs text-gray-500">Ibiri isigaye - 8:00 AM</p>
+                </div>
+                <ClockIcon className="w-4 h-4 text-gray-400"/>
+            </div>
+            <div className="flex items-center bg-white p-3 rounded-lg border opacity-60">
+                <div className="p-2 bg-green-100 rounded-full"><CheckCircleIcon className="w-5 h-5 text-green-500"/></div>
+                <div className="ml-3 flex-1">
+                    <p className="text-sm font-semibold">Ibuprofen</p>
+                    <p className="text-xs text-gray-500">Byakozwe - 9:00 PM ejo</p>
                 </div>
             </div>
           </div>
         </div>
         
         <div>
-          <h3 className="font-bold text-gray-800 mb-4">Ibipimo by'Ubuzima</h3>
-           <div className="grid grid-cols-2 gap-4">
-               <div className="bg-white p-3 rounded-lg text-center border">
-                   <p className="text-xs text-gray-500">Umuterere w'Umutima</p>
-                   <p className="text-lg font-bold text-red-500">72 <span className="text-sm font-normal">bpm</span></p>
-               </div>
-                <div className="bg-white p-3 rounded-lg text-center border">
-                   <p className="text-xs text-gray-500">Umuvuduko w'Amaraso</p>
-                   <p className="text-lg font-bold text-blue-600">120/80</p>
-               </div>
+          <h3 className="font-bold text-gray-800 mb-4">Ibikorwa byihuse</h3>
+           <div className="grid grid-cols-2 gap-3">
+               <button className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50">
+                   <PlusCircleIcon className="w-6 h-6 text-blue-600 mb-1"/>
+                   <p className="text-xs font-semibold text-gray-700">Gufata Gahunda</p>
+               </button>
+                <button className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50">
+                   <PillIcon className="w-6 h-6 text-green-600 mb-1"/>
+                   <p className="text-xs font-semibold text-gray-700">Kongeresha Imiti</p>
+               </button>
            </div>
-        </div>
-
-        <div>
-          <h3 className="font-bold text-gray-800 mb-4">Ibikorwa Biheruka</h3>
-          <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                      <HeartPulseIcon className="w-4 h-4 text-green-600" />
-                  </div>
-                  <p className="text-xs text-gray-600">
-                      Imiti yawe ya <span className="font-semibold">Allergy</span> yongeye gutangwa.
-                  </p>
-              </li>
-              <li className="flex items-start space-x-3">
-                   <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                      <UserIcon className="w-4 h-4 text-indigo-600" />
-                  </div>
-                  <p className="text-xs text-gray-600">
-                      Ubutumwa bushya buvuye kwa <span className="font-semibold">Dr. Isabella Monroe</span>.
-                  </p>
-              </li>
-          </ul>
         </div>
 
       </div>

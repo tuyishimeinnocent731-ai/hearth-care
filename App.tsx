@@ -8,6 +8,7 @@ import DoctorSelection from './components/DoctorSelection';
 import PaymentForm from './components/PaymentForm';
 import ChatWindow from './components/ChatWindow';
 import ConsultationSummary from './components/ConsultationSummary';
+import VideoCallModal from './components/VideoCallModal';
 
 type AppStep = 'doctor-selection' | 'payment' | 'chat' | 'summary';
 
@@ -16,6 +17,7 @@ const App: React.FC = () => {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const handleSelectDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
@@ -47,6 +49,9 @@ const App: React.FC = () => {
     setCurrentStep('doctor-selection');
   };
 
+  const openVideoModal = () => setIsVideoModalOpen(true);
+  const closeVideoModal = () => setIsVideoModalOpen(false);
+
   const filteredDoctors = useMemo(() => {
     if (!searchQuery) return DOCTORS;
     return DOCTORS.filter(
@@ -63,7 +68,7 @@ const App: React.FC = () => {
       case 'payment':
         return <PaymentForm doctor={selectedDoctor} onPaymentSuccess={handlePaymentSuccess} />;
       case 'chat':
-        return <ChatWindow doctor={selectedDoctor} initialMessages={messages} onEndConsultation={handleEndConsultation} />;
+        return <ChatWindow doctor={selectedDoctor} initialMessages={messages} onEndConsultation={handleEndConsultation} onVideoCall={openVideoModal} />;
       case 'summary':
         return <ConsultationSummary doctor={selectedDoctor} chatHistory={messages} onStartNew={handleStartNew} />;
       default:
@@ -72,18 +77,25 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans">
-      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <div className="flex flex-1 overflow-hidden">
-        <LeftAside onNavigateHome={handleStartNew} />
-        <main className="flex-1 overflow-y-auto bg-white">
-          <div className="container mx-auto max-w-5xl">
-            {renderContent()}
-          </div>
-        </main>
-        <RightAside />
+    <>
+      <div className="flex flex-col h-screen bg-gray-100 font-sans">
+        <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <div className="flex flex-1 overflow-hidden">
+          <LeftAside onNavigateHome={handleStartNew} onVideoCall={openVideoModal} />
+          <main className="flex-1 overflow-y-auto bg-white">
+            <div className="container mx-auto max-w-5xl">
+              {renderContent()}
+            </div>
+          </main>
+          <RightAside />
+        </div>
       </div>
-    </div>
+      <VideoCallModal 
+        isOpen={isVideoModalOpen} 
+        onClose={closeVideoModal} 
+        doctorName={selectedDoctor?.name || 'your doctor'} 
+      />
+    </>
   );
 };
 

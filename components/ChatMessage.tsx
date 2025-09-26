@@ -30,13 +30,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, doctor }) => {
         />
       )}
       <div
-        className={`max-w-lg p-3 rounded-xl shadow-sm ${
+        className={`max-w-lg rounded-xl shadow-sm ${
           isUser
             ? 'bg-blue-600 text-white rounded-br-none'
             : 'bg-gray-100 text-gray-800 rounded-bl-none'
-        }`}
+        } ${message.attachment ? 'p-1' : 'p-3'}`}
       >
-        <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+        {message.attachment && (
+            <div className="mb-2 max-w-xs">
+                {message.attachment.type === 'image' ? (
+                    <img src={message.attachment.data} alt="Attachment" className="rounded-lg w-full"/>
+                ) : (
+                    <video src={message.attachment.data} controls className="rounded-lg w-full"/>
+                )}
+            </div>
+        )}
+        {message.text && <p className={`text-sm whitespace-pre-wrap ${message.attachment ? 'px-2 pb-2' : ''}`}>{message.text}</p>}
       </div>
       {isUser && (
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HomeIcon, UserCircleIcon, MessageSquareIcon, FileTextIcon, SettingsIcon, LogOutIcon } from './IconComponents';
+import { HomeIcon, UserCircleIcon, MessageSquareIcon, FileTextIcon, SettingsIcon, LogOutIcon, VideoIcon, ChartBarIcon } from './IconComponents';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -28,9 +28,10 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, active, onClick }) => (
 
 interface LeftAsideProps {
     onNavigateHome: () => void;
+    onVideoCall: () => void;
 }
 
-const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome }) => {
+const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome, onVideoCall }) => {
     const [activeItem, setActiveItem] = useState('Shakisha Muganga');
 
     const handleNavClick = (label: string, action?: () => void) => {
@@ -41,6 +42,13 @@ const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome }) => {
   return (
     <aside className="hidden md:flex w-72 bg-white border-r border-gray-200 p-4 flex-col">
       <div className="flex flex-col h-full">
+        <div className="flex items-center mb-6 px-2">
+            <img src="https://picsum.photos/seed/user/200/200" alt="User" className="w-11 h-11 rounded-full" />
+            <div className="ml-3">
+                <p className="font-bold text-gray-800">K. Nkurunziza</p>
+                <p className="text-xs text-gray-500">nkurunziza.k@example.com</p>
+            </div>
+        </div>
         <nav className="flex-1 space-y-2">
           <NavItem 
             icon={<HomeIcon className="w-5 h-5" />} 
@@ -55,6 +63,12 @@ const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome }) => {
             onClick={() => handleNavClick('Shakisha Muganga', onNavigateHome)} 
             />
           <NavItem 
+            icon={<VideoIcon className="w-5 h-5" />} 
+            label="Ubujyanama kuri Video" 
+            active={activeItem === 'Ubujyanama kuri Video'} 
+            onClick={() => handleNavClick('Ubujyanama kuri Video', onVideoCall)} 
+            />
+          <NavItem 
             icon={<MessageSquareIcon className="w-5 h-5" />} 
             label="Ubutumwa" 
             active={activeItem === 'Ubutumwa'}
@@ -67,10 +81,10 @@ const LeftAside: React.FC<LeftAsideProps> = ({ onNavigateHome }) => {
             onClick={() => handleNavClick('Imiti wandikiwe')}
             />
           <NavItem 
-            icon={<FileTextIcon className="w-5 h-5" />} 
-            label="Amadosiye y'Ubuvuzi" 
-            active={activeItem === 'Amadosiye y\'Ubuvuzi'}
-            onClick={() => handleNavClick('Amadosiye y\'Ubuvuzi')}
+            icon={<ChartBarIcon className="w-5 h-5" />} 
+            label="Imbonerahamwe y'Ubuzima" 
+            active={activeItem === 'Imbonerahamwe y\'Ubuzima'}
+            onClick={() => handleNavClick('Imbonerahamwe y\'Ubuzima')}
             />
         </nav>
         

@@ -14,6 +14,10 @@ export interface Message {
   text: string;
   sender: 'user' | 'doctor' | 'system';
   timestamp: string;
+  attachment?: {
+    type: 'image' | 'video';
+    data: string; // base64 data URL
+  };
 }
 
 export interface ConsultationSummaryData {
