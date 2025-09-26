@@ -48,6 +48,31 @@ const fileToGenerativePart = async (file: File) => {
     };
 };
 
+export const getAIHealthAdvice = async (
+    newMessage: string,
+    history: Message[]
+): Promise<string> => {
+    try {
+        const chatHistory = formatChatHistory(history);
+
+        const response = await ai.models.generateContent({
+            model: model,
+            contents: [
+                ...chatHistory,
+                { role: 'user', parts: [{ text: newMessage }] }
+            ],
+            config: {
+                systemInstruction: `You are a helpful AI health assistant from MediConnect AI. Provide general health advice and information for disease prevention. Your responses should be informative, safe, and encouraging. Always remind the user that you are not a real doctor and they should consult a professional for medical diagnosis and treatment. Your advice is for informational purposes only. Speak in Kinyarwanda.`,
+            }
+        });
+
+        return response.text;
+    } catch (error) {
+        console.error("Error calling Gemini API for AI Health Advice:", error);
+        return "Tuvuganye n'ikibazo cya tekiniki. Mwihangane musubiremo nyuma.";
+    }
+};
+
 export const sendSymptomDetails = async (
     newMessage: string,
     history: Message[],

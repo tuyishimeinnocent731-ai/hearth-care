@@ -110,7 +110,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndC
   if (!doctor) return <div className="p-8 text-center text-red-500">Muganga ntiyatoranijwe. Subira inyuma uhitemo.</div>;
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-4rem)] p-4 md:p-6">
+    <div className="flex flex-col h-[calc(100vh-4rem)] p-4 md:p-6">
        <div className="flex-shrink-0 pb-4 border-b border-gray-200">
             <div className="flex items-center flex-wrap gap-y-2">
                 <img src={doctor.imageUrl} alt={doctor.name} className="w-12 h-12 rounded-full" />

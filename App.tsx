@@ -9,20 +9,36 @@ import PaymentForm from './components/PaymentForm';
 import ChatWindow from './components/ChatWindow';
 import ConsultationSummary from './components/ConsultationSummary';
 import VideoCallModal from './components/VideoCallModal';
+import MessagesPage from './pages/MessagesPage';
+import PrescriptionsPage from './pages/PrescriptionsPage';
+import HealthDashboardPage from './pages/HealthDashboardPage';
+import AppointmentsPage from './pages/AppointmentsPage';
+import SettingsPage from './pages/SettingsPage';
+import VideoConsultationPage from './pages/VideoConsultationPage';
+import AIChatPage from './pages/AIChatPage';
 
-type AppStep = 'doctor-selection' | 'payment' | 'chat' | 'summary';
+
+export type Page = 'home' | 'messages' | 'prescriptions' | 'dashboard' | 'appointments' | 'settings' | 'video' | 'ai-chat';
+type ChatStep = 'doctor-selection' | 'payment' | 'chat' | 'summary';
 
 const App: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<AppStep>('doctor-selection');
+  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [chatStep, setChatStep] = useState<ChatStep>('doctor-selection');
+  
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
+  const handleNavigate = (page: Page) => {
+    setCurrentPage(page);
+    setIsMobileNavOpen(false); // Close mobile nav on navigation
+  };
+
   const handleSelectDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
-    setCurrentStep('payment');
+    setChatStep('payment');
   };
 
   const handlePaymentSuccess = () => {
@@ -35,19 +51,20 @@ const App: React.FC = () => {
         timestamp: new Date().toISOString(),
       },
     ]);
-    setCurrentStep('chat');
+    setChatStep('chat');
   };
 
   const handleEndConsultation = (chatHistory: Message[]) => {
     setMessages(chatHistory);
-    setCurrentStep('summary');
+    setChatStep('summary');
   };
 
   const handleStartNew = () => {
     setSelectedDoctor(null);
     setMessages([]);
     setSearchQuery('');
-    setCurrentStep('doctor-selection');
+    setChatStep('doctor-selection');
+    setCurrentPage('home');
   };
 
   const openVideoModal = () => setIsVideoModalOpen(true);
@@ -62,14 +79,14 @@ const App: React.FC = () => {
     );
   }, [searchQuery]);
 
-  const renderContent = () => {
-    switch (currentStep) {
+  const renderConsultationFlow = () => {
+    switch (chatStep) {
       case 'doctor-selection':
         return <DoctorSelection doctors={filteredDoctors} onSelect={handleSelectDoctor} />;
       case 'payment':
         return <PaymentForm doctor={selectedDoctor} onPaymentSuccess={handlePaymentSuccess} />;
       case 'chat':
-        return <ChatWindow doctor={selectedDoctor} initialMessages={messages} onEndConsultation={handleEndConsultation} onVideoCall={openVideoModal} />;
+        return <ChatWindow doctor={selectedDoctor} initialMessages={messages} onEndConsultation={handleEndConsultation} onVideoCall={() => handleNavigate('video')} />;
       case 'summary':
         return <ConsultationSummary doctor={selectedDoctor} chatHistory={messages} onStartNew={handleStartNew} />;
       default:
@@ -77,22 +94,46 @@ const App: React.FC = () => {
     }
   };
 
+  const renderPage = () => {
+    switch (currentPage) {
+        case 'home':
+            return renderConsultationFlow();
+        case 'messages':
+            return <MessagesPage />;
+        case 'prescriptions':
+            return <PrescriptionsPage />;
+        case 'dashboard':
+            return <HealthDashboardPage />;
+        case 'appointments':
+            return <AppointmentsPage />;
+        case 'settings':
+            return <SettingsPage />;
+        case 'video':
+            return <VideoConsultationPage onScheduleCall={openVideoModal}/>;
+        case 'ai-chat':
+            return <AIChatPage />;
+        default:
+            return renderConsultationFlow();
+    }
+  };
+
   return (
     <>
-      <div className="flex flex-col h-screen bg-gray-100 font-sans">
+      <div className="bg-gray-100 font-sans">
         <Header 
           searchQuery={searchQuery} 
           onSearchChange={setSearchQuery} 
           onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         />
-        <div className="flex flex-1 overflow-hidden">
-          <LeftAside 
-            onNavigateHome={handleStartNew} 
-            onVideoCall={openVideoModal}
-            isMobileNavOpen={isMobileNavOpen}
-            onCloseMobileNav={() => setIsMobileNavOpen(false)}
-          />
-          <main className="flex-1 overflow-y-auto bg-white relative">
+        
+        <LeftAside 
+          onNavigate={handleNavigate}
+          currentPage={currentPage}
+          isMobileNavOpen={isMobileNavOpen}
+          onCloseMobileNav={() => setIsMobileNavOpen(false)}
+        />
+
+        <main className="min-h-screen pt-16 lg:ml-72 lg:mr-80">
             {isMobileNavOpen && (
               <div 
                 className="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden"
@@ -100,12 +141,10 @@ const App: React.FC = () => {
                 aria-hidden="true"
               ></div>
             )}
-            <div className="container mx-auto max-w-5xl">
-              {renderContent()}
-            </div>
-          </main>
-          <RightAside />
-        </div>
+            {renderPage()}
+        </main>
+
+        <RightAside onNavigate={handleNavigate} />
       </div>
       <VideoCallModal 
         isOpen={isVideoModalOpen} 
