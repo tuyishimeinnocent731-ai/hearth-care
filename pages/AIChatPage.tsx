@@ -67,10 +67,11 @@ const AIChatMessage: React.FC<{ message: Message }> = ({ message }) => {
                 >
                      {message.attachment && (
                         <div className="mb-2 max-w-xs">
+                            {/* FIX: The attachment object uses the 'url' property, not 'data', to store the attachment source, as defined in types.ts. */}
                             {message.attachment.type === 'image' ? (
-                                <img src={message.attachment.data} alt="Attachment" className="rounded-lg w-full"/>
+                                <img src={message.attachment.url} alt="Attachment" className="rounded-lg w-full"/>
                             ) : (
-                                <video src={message.attachment.data} controls className="rounded-lg w-full"/>
+                                <video src={message.attachment.url} controls className="rounded-lg w-full"/>
                             )}
                         </div>
                     )}
@@ -207,9 +208,10 @@ const AIChatPage: React.FC<AIChatPageProps> = ({ userProfile }) => {
             attachmentData = await new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
+                    // FIX: Corrected the attachment object property from 'data' to 'url' to match the 'Message' type definition, resolving the property error.
                     resolve({
                         type: fileToSend.type.startsWith('image/') ? 'image' : 'video',
-                        data: reader.result as string,
+                        url: reader.result as string,
                     });
                 };
                 reader.readAsDataURL(fileToSend);

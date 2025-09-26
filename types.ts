@@ -1,66 +1,86 @@
 
 export interface Doctor {
-  id: number;
-  name: string;
-  specialty: string;
-  rating: number;
-  reviews: number;
-  imageUrl: string;
-  consultationFee: number;
+    id: number;
+    name: string;
+    specialty: string;
+    imageUrl: string;
+    bio: string;
+    rating: number;
+    reviews: number;
+    consultationFee: number;
+    available: boolean;
+    languages: string[];
 }
 
 export interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'doctor' | 'system';
-  timestamp: string;
-  attachment?: {
-    type: 'image' | 'video';
-    data: string; // base64 data URL
-  };
+    id: string;
+    text: string;
+    sender: 'user' | 'doctor' | 'system';
+    timestamp: string;
+    attachment?: {
+        type: 'image' | 'video' | 'audio' | 'file';
+        url: string;
+        name?: string;
+        size?: string;
+    };
+    status?: 'sent' | 'delivered' | 'read';
 }
 
 export interface UserProfile {
-  fullName: string;
-  email: string;
-  profilePicture: string;
-  phone: string;
-  dob: string; // YYYY-MM-DD
-  location: string;
-  height?: number; // cm
-  weight?: number; // kg
-  bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | 'N/A';
-  allergies: string[];
-  chronicConditions: string[];
-  pastSurgeries: string[];
-  emergencyContact: {
-    name: string;
+    fullName: string;
+    email: string;
     phone: string;
-  };
-  lifestyle: {
-    smokingStatus: 'Not Specified' | 'Never' | 'Former' | 'Current';
-    alcoholConsumption: 'Not Specified' | 'None' | 'Occasional' | 'Regular';
-  };
+    dob: string;
+    location: string;
+    profilePicture: string;
+    height?: number;
+    weight?: number;
+    bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | 'N/A';
+    allergies: string[];
+    chronicConditions: string[];
+    pastSurgeries: string[];
+    emergencyContact: {
+        name: string;
+        phone: string;
+    };
+    lifestyle: {
+        smokingStatus: 'Not Specified' | 'Never' | 'Former' | 'Current';
+        alcoholConsumption: 'Not Specified' | 'None' | 'Occasional' | 'Regular';
+    };
 }
 
-export interface ConsultationSummaryData {
-  symptoms: string;
-  diagnosis: string;
-  prescription: Array<{
-    name: string;
-    dosage: string;
-    frequency: string;
-  }>;
-  advice: string;
-}
+export type Page =
+    | 'dashboard'
+    | 'consultation-start'
+    | 'symptom-form'
+    | 'payment'
+    | 'chat'
+    | 'summary'
+    | 'appointments'
+    | 'schedule-appointment'
+    | 'messages'
+    | 'prescriptions'
+    | 'profile'
+    | 'settings'
+    | 'notifications'
+    | 'video-consultation'
+    | 'ai-chat';
 
 export interface Appointment {
-  id: number;
-  doctorName: string;
-  specialty: string;
-  date: string; // ISO string
-  type: 'Video Call' | 'Chat';
-  status: 'Upcoming' | 'Completed' | 'Cancelled';
+    id: number;
+    doctorName: string;
+    specialty: string;
+    date: string;
+    type: 'Video Call' | 'Chat';
+    status: 'Upcoming' | 'Completed' | 'Cancelled';
+}
+
+export interface Conversation {
+    id: number;
+    doctor: Doctor;
+    messages: Message[];
+    unread: number;
+    isTyping?: boolean;
 }
 
 export interface Prescription {
@@ -68,8 +88,17 @@ export interface Prescription {
     medication: string;
     dosage: string;
     frequency: string;
+    dateIssued: string;
     doctorName: string;
-    dateIssued: string; // ISO string
-    status: 'Active' | 'Inactive';
     refillsLeft: number;
+    status: 'Active' | 'Inactive';
+}
+
+export interface Notification {
+    id: number;
+    title: string;
+    message: string;
+    timestamp: string;
+    read: boolean;
+    category: 'appointment' | 'message' | 'system' | 'prescription';
 }

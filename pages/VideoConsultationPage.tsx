@@ -1,13 +1,14 @@
 import React from 'react';
 import { VideoIcon, PlusCircleIcon, CalendarIcon } from '../components/IconComponents';
-import { MOCK_APPOINTMENTS } from '../mockData';
+import type { Appointment } from '../types';
 
 interface VideoConsultationPageProps {
   onScheduleCall: () => void;
+  appointments: Appointment[];
 }
 
-const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onScheduleCall }) => {
-    const videoAppointments = MOCK_APPOINTMENTS.filter(a => a.type === 'Video Call');
+const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onScheduleCall, appointments }) => {
+    const videoAppointments = appointments.filter(a => a.type === 'Video Call');
 
   return (
     <div className="p-6 md:p-8">

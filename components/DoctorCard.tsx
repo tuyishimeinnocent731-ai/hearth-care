@@ -1,41 +1,48 @@
+
 import React from 'react';
 import type { Doctor } from '../types';
-import { StarIcon } from './IconComponents';
+import { StarIcon, CheckCircleIcon } from './IconComponents';
 
 interface DoctorCardProps {
   doctor: Doctor;
-  onSelect: (doctor: Doctor) => void;
+  onViewProfile: () => void;
+  onStartConsultation: () => void;
 }
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onSelect }) => {
+const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onViewProfile, onStartConsultation }) => {
   return (
-    <div className="bg-gray-50 rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:bg-white border border-gray-200">
-      <div className="flex items-start space-x-5">
-        <img
-          className="h-24 w-24 rounded-full object-cover"
-          src={doctor.imageUrl}
-          alt={`Dr. ${doctor.name}`}
-        />
-        <div className="flex-1">
-          <h3 className="text-lg font-bold text-gray-900">{doctor.name}</h3>
-          <p className="text-blue-600 font-medium">{doctor.specialty}</p>
-          <div className="flex items-center mt-2">
-            <StarIcon className="w-5 h-5 text-yellow-400" />
-            <span className="ml-1.5 text-gray-700 font-semibold">{doctor.rating}</span>
-            <span className="ml-2 text-gray-500">({doctor.reviews} ibitekerezo)</span>
-          </div>
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+      <div className="flex items-center mb-4">
+        <img src={doctor.imageUrl} alt={doctor.name} className="w-20 h-20 rounded-full object-cover ring-4 ring-blue-100" />
+        <div className="ml-4">
+          <h3 className="text-xl font-bold text-gray-900">{doctor.name}</h3>
+          <p className="text-sm text-blue-600 font-medium">{doctor.specialty}</p>
         </div>
       </div>
-      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-        <div>
-            <p className="text-sm text-gray-500">Ikiguzi</p>
-            <p className="text-xl font-bold text-gray-800">{doctor.consultationFee.toLocaleString('rw-RW')} RWF</p>
+      <p className="text-sm text-gray-600 flex-grow mb-4">{doctor.bio.substring(0, 100)}...</p>
+      <div className="flex justify-between items-center text-sm mb-4">
+        <div className="flex items-center text-yellow-500">
+          <StarIcon className="w-5 h-5 mr-1" />
+          <span className="font-bold">{doctor.rating}</span>
+          <span className="text-gray-500 ml-1">({doctor.reviews} reviews)</span>
         </div>
-        <button
-          onClick={() => onSelect(doctor)}
-          className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105"
+        {doctor.available ? (
+            <span className="flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-800">
+                <CheckCircleIcon className="w-3 h-3 mr-1" />
+                Ari online
+            </span>
+        ) : (
+             <span className="text-xs font-medium text-gray-500">Ntari online</span>
+        )}
+      </div>
+      <div className="border-t border-gray-200 pt-4 flex flex-col sm:flex-row gap-2">
+        <button onClick={onViewProfile} className="w-full text-center px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Reba Umwirondoro</button>
+        <button 
+            onClick={onStartConsultation} 
+            disabled={!doctor.available}
+            className="w-full text-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
-          Tangira Ubujyanama
+            Gisha Inama
         </button>
       </div>
     </div>

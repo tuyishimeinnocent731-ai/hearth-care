@@ -1,16 +1,30 @@
 import React from 'react';
-import { CalendarIcon, ClockIcon, VideoIcon, MessageSquareIcon } from '../components/IconComponents';
-import { MOCK_APPOINTMENTS } from '../mockData';
+import { CalendarIcon, ClockIcon, VideoIcon, MessageSquareIcon, PlusCircleIcon } from '../components/IconComponents';
+import type { Appointment, Page } from '../types';
 
-const AppointmentsPage: React.FC = () => {
-    const upcomingAppointments = MOCK_APPOINTMENTS.filter(a => a.status === 'Upcoming');
-    const pastAppointments = MOCK_APPOINTMENTS.filter(a => a.status !== 'Upcoming');
+interface AppointmentsPageProps {
+    appointments: Appointment[];
+    onNavigate: (page: Page) => void;
+}
+
+const AppointmentsPage: React.FC<AppointmentsPageProps> = ({ appointments, onNavigate }) => {
+    const upcomingAppointments = appointments.filter(a => a.status === 'Upcoming');
+    const pastAppointments = appointments.filter(a => a.status !== 'Upcoming');
 
   return (
     <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Gahunda Zanjye</h1>
-        <p className="mt-2 text-lg text-gray-600">Reba kandi ucunge gahunda zawe ziteganyijwe n'izabaye.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 className="text-3xl font-bold text-gray-800">Gahunda Zanjye</h1>
+            <p className="mt-2 text-lg text-gray-600">Reba kandi ucunge gahunda zawe ziteganyijwe n'izabaye.</p>
+        </div>
+        <button 
+            onClick={() => onNavigate('schedule-appointment')}
+            className="mt-4 md:mt-0 flex items-center px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+            <PlusCircleIcon className="w-5 h-5 mr-2"/>
+            Fata Gahunda Nshya
+        </button>
       </div>
 
       <div className="space-y-8">

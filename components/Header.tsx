@@ -1,148 +1,51 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { HeartPulseIcon, SearchIcon, BellIcon, UserCircleIcon, SettingsIcon, LogOutIcon, ChevronDownIcon, MenuIcon } from './IconComponents';
-import type { UserProfile } from '../types';
-import type { Page } from '../App';
+
+import React, { useState } from 'react';
+import type { Page, UserProfile } from '../types';
+import { SearchIcon, BellIcon, MenuIcon, XIcon } from './IconComponents';
 
 interface HeaderProps {
-    searchQuery: string;
-    onSearchChange: (query: string) => void;
-    onToggleMobileNav: () => void;
     userProfile: UserProfile;
     onNavigate: (page: Page) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, onToggleMobileNav, userProfile, onNavigate }) => {
-    const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const [notificationsOpen, setNotificationsOpen] = useState(false);
-    const userMenuRef = useRef<HTMLDivElement>(null);
-    const notificationsRef = useRef<HTMLDivElement>(null);
+const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate }) => {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-                setUserMenuOpen(false);
-            }
-            if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-                setNotificationsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    const handleMenuClick = (page: Page) => {
-      onNavigate(page);
-      setUserMenuOpen(false);
-    }
-
-  return (
-    <header className="bg-blue-600 text-white fixed top-0 left-0 right-0 z-20 lg:left-72 lg:right-80">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Mobile Nav Toggle */}
-          <div className="flex items-center">
-            <button
-              onClick={onToggleMobileNav}
-              className="lg:hidden mr-3 p-2 rounded-md text-blue-100 hover:text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-            >
-              <span className="sr-only">Open main menu</span>
-              <MenuIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-            <div className="lg:hidden">
-              <HeartPulseIcon className="h-8 w-8 text-white" />
-            </div>
-            
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex-1 flex justify-center px-2 lg:ml-6 lg:justify-start">
-            <div className="max-w-md w-full lg:max-w-xs">
-              <label htmlFor="search" className="sr-only">Shakisha</label>
-              <div className="relative text-blue-200 focus-within:text-white">
-                <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <SearchIcon className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <input
-                  id="search"
-                  className="block w-full bg-blue-500 py-2 pl-10 pr-3 border border-transparent rounded-md leading-5 text-white placeholder-blue-200 focus:outline-none focus:bg-blue-400 focus:ring-0 sm:text-sm"
-                  placeholder="Shakisha abaganga, ibimenyetso..."
-                  type="search"
-                  name="search"
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right Section */}
-          <div className="flex items-center space-x-4">
-             <div className="relative" ref={notificationsRef}>
-                 <button
-                  onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  type="button"
-                  className="p-1 rounded-full text-blue-100 hover:text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white"
-                >
-                  <span className="sr-only">Reba amatangazo</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-                {notificationsOpen && (
-                    <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <div className="py-1">
-                            <div className="font-bold px-4 py-2 text-gray-700">Amatangazo</div>
-                            <div className="border-t border-gray-100"></div>
-                            <a href="#" className="block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100">
-                                <p className="font-medium text-gray-800">Ubuhamya bushya</p>
-                                <p className="truncate">Dr. Isabella Monroe yasubije ubutumwa bwawe.</p>
-                            </a>
-                            <a href="#" className="block px-4 py-3 text-sm text-gray-600 hover:bg-gray-100">
-                                <p className="font-medium text-gray-800">Kwibutswa gahunda</p>
-                                <p>Ifatabuguzi ryawe na Dr. Chen riri hafi.</p>
-                            </a>
+    return (
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
+            <div className="mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-16">
+                    <div className="flex items-center">
+                        <button className="lg:hidden mr-4 text-gray-600" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                             {mobileMenuOpen ? <XIcon className="w-6 h-6"/> : <MenuIcon className="w-6 h-6"/>}
+                        </button>
+                        <div className="relative hidden md:block">
+                            <input
+                                type="text"
+                                placeholder="Shakisha..."
+                                className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-full bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <SearchIcon className="h-5 w-5 text-gray-400" />
+                            </div>
                         </div>
                     </div>
-                )}
-             </div>
-
-            <div className="relative" ref={userMenuRef}>
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                type="button"
-                className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white"
-                id="user-menu-button"
-                aria-expanded={userMenuOpen}
-                aria-haspopup="true"
-              >
-                <span className="sr-only">Fungura menu y'ukoresha</span>
-                <img
-                  className="h-9 w-9 rounded-full object-cover"
-                  src={userProfile.profilePicture}
-                  alt="Ifoto y'ukoresha"
-                />
-                <ChevronDownIcon className="w-4 h-4 ml-1 text-gray-500" />
-              </button>
-              {userMenuOpen && (
-                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <a href="#" onClick={(e) => { e.preventDefault(); handleMenuClick('profile'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <UserCircleIcon className="w-5 h-5 mr-2" /> Umwirondoro
-                    </a>
-                     <a href="#" onClick={(e) => { e.preventDefault(); handleMenuClick('settings'); }} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <SettingsIcon className="w-5 h-5 mr-2" /> Igenamiterere
-                    </a>
-                    <a href="#" className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                        <LogOutIcon className="w-5 h-5 mr-2" /> Gusohoka
-                    </a>
-                  </div>
-              )}
+                    <div className="flex items-center space-x-4">
+                        <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700" onClick={() => onNavigate('notifications')}>
+                            <BellIcon className="w-6 h-6"/>
+                        </button>
+                        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => onNavigate('profile')}>
+                            <img src={userProfile.profilePicture} alt="User" className="w-9 h-9 rounded-full"/>
+                            <div className="hidden sm:block">
+                                <p className="text-sm font-semibold text-gray-800">{userProfile.fullName}</p>
+                                <p className="text-xs text-gray-500">Umurwayi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
+        </header>
+    );
 };
 
 export default Header;

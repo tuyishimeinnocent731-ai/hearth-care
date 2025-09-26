@@ -1,4 +1,3 @@
-// FIX: Create ChatWindow component
 import React, { useState, useEffect, useRef } from 'react';
 import type { Doctor, Message } from '../types';
 import ChatMessage from './ChatMessage';
@@ -9,11 +8,12 @@ import { SendIcon, PaperclipIcon, VideoIcon, XIcon } from './IconComponents';
 interface ChatWindowProps {
   doctor: Doctor | null;
   initialMessages: Message[];
+  initialFile?: File | null;
   onEndConsultation: (chatHistory: Message[]) => void;
   onVideoCall: () => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndConsultation, onVideoCall }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, initialFile, onEndConsultation, onVideoCall }) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +26,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndC
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    // Auto-trigger first response if initial messages contain user input
+    const hasUserMessage = initialMessages.some(m => m.sender === 'user');
+    if (hasUserMessage && doctor) {
+      const userMessages = initialMessages.filter(m => m.sender === 'user');
+      const latestUserMessage = userMessages[userMessages.length - 1];
+      getDoctorResponse(latestUserMessage.text, initialMessages, initialFile);
+    }
+  }, [initialMessages, doctor, initialFile]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -36,6 +46,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndC
 
   const removeFile = () => {
     setSelectedFile(null);
+    if (filePreview) URL.revokeObjectURL(filePreview);
     setFilePreview(null);
     if(fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -48,51 +59,43 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndC
 
     let attachmentData: Message['attachment'] | undefined = undefined;
 
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedFile);
-      reader.onloadend = async () => {
-        attachmentData = {
-          type: selectedFile.type.startsWith('image/') ? 'image' : 'video',
-          data: reader.result as string,
-        };
-        sendMessageWithAttachment(attachmentData);
+    const fileToSend = selectedFile;
+    if (fileToSend) {
+      attachmentData = {
+          type: fileToSend.type.startsWith('image/') ? 'image' : 'video',
+          url: URL.createObjectURL(fileToSend),
       };
-    } else {
-        sendMessageWithAttachment(undefined);
     }
-  };
-
-  const sendMessageWithAttachment = async (attachment: Message['attachment'] | undefined) => {
-    if (!doctor) return;
+    
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       text: newMessage,
       sender: 'user',
       timestamp: new Date().toISOString(),
-      attachment: attachment,
+      attachment: attachmentData,
     };
 
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
+    getDoctorResponse(newMessage, updatedMessages, fileToSend);
+
     setNewMessage('');
+    removeFile();
+  };
+
+  const getDoctorResponse = async (prompt: string, currentChatHistory: Message[], file?: File | null) => {
+    if (!doctor) return;
     setIsLoading(true);
 
-    if(filePreview) {
-      URL.revokeObjectURL(filePreview);
-    }
-    const fileToSend = selectedFile;
-    removeFile();
-
     try {
-      const botResponseText = await sendSymptomDetails(newMessage, messages, doctor, fileToSend);
+      const botResponseText = await sendSymptomDetails(prompt, currentChatHistory, doctor, file);
       const botMessage: Message = {
         id: `doctor-${Date.now()}`,
         text: botResponseText,
         sender: 'doctor',
         timestamp: new Date().toISOString(),
       };
-      setMessages([...updatedMessages, botMessage]);
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Failed to get response:', error);
       const errorMessage: Message = {
@@ -101,7 +104,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ doctor, initialMessages, onEndC
         sender: 'system',
         timestamp: new Date().toISOString(),
       };
-      setMessages([...updatedMessages, errorMessage]);
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }

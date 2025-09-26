@@ -1,172 +1,171 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
+import type { Page, Doctor, Message, UserProfile, Appointment, Conversation } from './types';
 import { DOCTORS } from './constants';
-import { MOCK_USER_PROFILE } from './mockData';
-import type { Doctor, Message, UserProfile } from './types';
+import { MOCK_USER_PROFILE, MOCK_APPOINTMENTS, MOCK_CONVERSATIONS } from './mockData';
 
-// Components
-import Header from './components/Header';
 import LeftAside from './components/LeftAside';
+import Header from './components/Header';
 import RightAside from './components/RightAside';
 import DoctorSelection from './components/DoctorSelection';
+import SymptomFormPage from './pages/SymptomFormPage';
 import PaymentForm from './components/PaymentForm';
 import ChatWindow from './components/ChatWindow';
 import ConsultationSummary from './components/ConsultationSummary';
-import VideoCallModal from './components/VideoCallModal';
-
-// Pages
-import AIChatPage from './pages/AIChatPage';
+import HealthDashboardPage from './pages/HealthDashboardPage';
+import AppointmentsPage from './pages/AppointmentsPage';
+import ScheduleAppointmentPage from './pages/ScheduleAppointmentPage';
+import MessagesPage from './pages/MessagesPage';
+import PrescriptionsPage from './pages/PrescriptionsPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
-import AppointmentsPage from './pages/AppointmentsPage';
-import PrescriptionsPage from './pages/PrescriptionsPage';
-import HealthDashboardPage from './pages/HealthDashboardPage';
+import NotificationsPage from './pages/NotificationsPage';
 import VideoConsultationPage from './pages/VideoConsultationPage';
-import MessagesPage from './pages/MessagesPage';
+import AIChatPage from './pages/AIChatPage';
+import VideoCallModal from './components/VideoCallModal';
 
-export type Page = 
-  'home' | 
-  'payment' | 
-  'chat' | 
-  'summary' | 
-  'ai-chat' | 
-  'profile' | 
-  'settings' |
-  'appointments' |
-  'prescriptions' |
-  'dashboard' |
-  'video' |
-  'messages';
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [chatHistory, setChatHistory] = useState<Message[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [isVideCallModalOpen, setIsVideoCallModalOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile>(MOCK_USER_PROFILE);
+    const [page, setPage] = useState<Page>('dashboard');
+    const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+    const [symptomDetails, setSymptomDetails] = useState<{ text: string; file?: File } | null>(null);
+    const [chatHistory, setChatHistory] = useState<Message[]>([]);
+    const [userProfile, setUserProfile] = useState<UserProfile>(MOCK_USER_PROFILE);
+    const [appointments, setAppointments] = useState<Appointment[]>(MOCK_APPOINTMENTS);
+    const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
+    const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
+    const [isVideoCallModalOpen, setIsVideoCallModalOpen] = useState(false);
 
-
-  const handleDoctorSelect = (doctor: Doctor) => {
-    setSelectedDoctor(doctor);
-    setCurrentPage('payment');
-  };
-
-  const handlePaymentSuccess = () => {
-    if (!selectedDoctor) return;
-    const initialMessage: Message = {
-        id: 'system-1',
-        sender: 'system',
-        text: `Ubujyanama na ${selectedDoctor.name} bwatangiye.`,
-        timestamp: new Date().toISOString()
+    const handleNavigate = (newPage: Page) => {
+        setPage(newPage);
     };
-    setChatHistory([initialMessage]);
-    setCurrentPage('chat');
-  };
 
-  const handleEndConsultation = (finalChatHistory: Message[]) => {
-    setChatHistory(finalChatHistory);
-    setCurrentPage('summary');
-  }
+    const handleSelectDoctor = (doctor: Doctor) => {
+        setSelectedDoctor(doctor);
+        setPage('symptom-form');
+    };
 
-  const handleStartNewConsultation = () => {
-    setSelectedDoctor(null);
-    setChatHistory([]);
-    setCurrentPage('home');
-  }
+    const handleSymptomSubmit = (details: { text: string; file?: File }) => {
+        setSymptomDetails(details);
+        setPage('payment');
+    };
 
-  const handleNavigate = (page: Page) => {
-      setCurrentPage(page);
-  }
+    const handlePaymentSuccess = () => {
+        if (!selectedDoctor || !symptomDetails) return;
+        const initialMessages: Message[] = [
+            {
+                id: 'system-1',
+                sender: 'system',
+                text: `Ubujyanama bwatangiye na Dr. ${selectedDoctor.name}`,
+                timestamp: new Date().toISOString(),
+            },
+            {
+                id: 'user-1',
+                sender: 'user',
+                text: symptomDetails.text,
+                timestamp: new Date().toISOString(),
+                attachment: symptomDetails.file ? { type: symptomDetails.file.type.startsWith('image/') ? 'image' : 'video', url: URL.createObjectURL(symptomDetails.file) } : undefined,
+            }
+        ];
+        setChatHistory(initialMessages);
+        setPage('chat');
+    };
 
-  const filteredDoctors = useMemo(() => {
-    if (currentPage !== 'home') return DOCTORS;
-    return DOCTORS.filter(doctor => 
-      doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery, currentPage]);
+    const handleEndConsultation = (finalChatHistory: Message[]) => {
+        setChatHistory(finalChatHistory);
+        setPage('summary');
+    };
+    
+    const handleStartNewConsultation = () => {
+        setSelectedDoctor(null);
+        setSymptomDetails(null);
+        setChatHistory([]);
+        setPage('consultation-start');
+    };
 
-  const onUpdateProfile = (profile: UserProfile) => {
-      setUserProfile(profile);
-      // Here you would typically also make an API call to save the profile
-  }
+    const handleScheduleAppointment = (newAppointment: Omit<Appointment, 'id' | 'status'>) => {
+        setAppointments(prev => [...prev, { ...newAppointment, id: Date.now(), status: 'Upcoming' }]);
+        setPage('appointments');
+    };
 
-  const renderContent = () => {
-    switch (currentPage) {
-      case 'home':
-        return <DoctorSelection doctors={filteredDoctors} onSelect={handleDoctorSelect} />;
-      case 'payment':
-        return <PaymentForm doctor={selectedDoctor} onPaymentSuccess={handlePaymentSuccess} />;
-      case 'chat':
-        return <ChatWindow 
+    const handleUpdateProfile = (updatedProfile: UserProfile) => {
+        setUserProfile(updatedProfile);
+    };
+
+    const handleSendMessage = (conversationId: number, message: Message) => {
+        setConversations(prev => prev.map(convo => {
+            if (convo.id === conversationId) {
+                return { ...convo, messages: [...convo.messages, message] };
+            }
+            return convo;
+        }));
+    };
+
+    const renderPage = () => {
+        switch (page) {
+            case 'dashboard':
+                return <HealthDashboardPage />;
+            case 'consultation-start':
+                return <DoctorSelection onSelectDoctor={handleSelectDoctor} />;
+            case 'symptom-form':
+                return <SymptomFormPage doctor={selectedDoctor} onSubmit={handleSymptomSubmit} />;
+            case 'payment':
+                return <PaymentForm doctor={selectedDoctor} onPaymentSuccess={handlePaymentSuccess} />;
+            case 'chat':
+                return <ChatWindow 
                     doctor={selectedDoctor} 
-                    initialMessages={chatHistory} 
+                    initialMessages={chatHistory}
+                    initialFile={symptomDetails?.file}
                     onEndConsultation={handleEndConsultation}
                     onVideoCall={() => setIsVideoCallModalOpen(true)}
                 />;
-      case 'summary':
-        return <ConsultationSummary doctor={selectedDoctor} chatHistory={chatHistory} onStartNew={handleStartNewConsultation} />;
-      case 'ai-chat':
-        return <AIChatPage userProfile={userProfile} />;
-      case 'profile':
-        return <ProfilePage userProfile={userProfile} onUpdateProfile={onUpdateProfile} />;
-      case 'settings':
-        return <SettingsPage onNavigate={handleNavigate} />;
-      case 'appointments':
-        return <AppointmentsPage />;
-      case 'prescriptions':
-        return <PrescriptionsPage />;
-      case 'dashboard':
-        return <HealthDashboardPage />;
-      case 'video':
-        return <VideoConsultationPage onScheduleCall={() => handleNavigate('home')} />;
-      case 'messages':
-        return <MessagesPage />;
-      default:
-        return <DoctorSelection doctors={filteredDoctors} onSelect={handleDoctorSelect} />;
-    }
-  };
+            case 'summary':
+                return <ConsultationSummary doctor={selectedDoctor} chatHistory={chatHistory} onStartNewConsultation={handleStartNewConsultation}/>;
+            case 'appointments':
+                return <AppointmentsPage appointments={appointments} onNavigate={handleNavigate} />;
+            case 'schedule-appointment':
+                return <ScheduleAppointmentPage doctors={DOCTORS} onSchedule={handleScheduleAppointment} onCancel={() => setPage('appointments')} />;
+            case 'messages':
+                return <MessagesPage 
+                    conversations={conversations} 
+                    selectedConversationId={selectedConversationId} 
+                    onSelectConversation={setSelectedConversationId}
+                    onSendMessage={handleSendMessage}
+                />;
+            case 'prescriptions':
+                return <PrescriptionsPage />;
+            case 'profile':
+                return <ProfilePage userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />;
+            case 'settings':
+                return <SettingsPage onNavigate={handleNavigate} />;
+            case 'notifications':
+                return <NotificationsPage />;
+            case 'video-consultation':
+                return <VideoConsultationPage appointments={appointments} onScheduleCall={() => setPage('schedule-appointment')} />;
+            case 'ai-chat':
+                return <AIChatPage userProfile={userProfile} />;
+            default:
+                return <HealthDashboardPage />;
+        }
+    };
 
-  return (
-    <div className="min-h-screen bg-gray-100 font-sans">
-      <LeftAside 
-        onNavigate={handleNavigate} 
-        currentPage={currentPage}
-        isMobileNavOpen={isMobileNavOpen}
-        onCloseMobileNav={() => setIsMobileNavOpen(false)}
-        userProfile={userProfile}
-      />
-      
-      <div className="lg:pl-72 lg:pr-80">
-        <Header 
-            searchQuery={searchQuery} 
-            onSearchChange={setSearchQuery}
-            onToggleMobileNav={() => setIsMobileNavOpen(true)}
-            userProfile={userProfile}
-            onNavigate={handleNavigate}
-        />
-        <main className="pt-16">
-          {renderContent()}
-        </main>
-      </div>
-
-      <RightAside onNavigate={handleNavigate} />
-
-      <VideoCallModal 
-        isOpen={isVideCallModalOpen}
-        onClose={() => setIsVideoCallModalOpen(false)}
-        doctorName={selectedDoctor?.name || 'your doctor'}
-      />
-       {isMobileNavOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/30 z-30"
-          onClick={() => setIsMobileNavOpen(false)}
-        ></div>
-      )}
-    </div>
-  );
+    return (
+        <div className="bg-gray-100 min-h-screen flex text-gray-800">
+            <LeftAside currentPage={page} onNavigate={handleNavigate} />
+            <div className="flex-1 flex flex-col lg:ml-64 lg:mr-80">
+                <Header userProfile={userProfile} onNavigate={handleNavigate} />
+                <main className="flex-1 overflow-y-auto">
+                    {renderPage()}
+                </main>
+            </div>
+            <RightAside onNavigate={handleNavigate}/>
+            {selectedDoctor && <VideoCallModal 
+                isOpen={isVideoCallModalOpen} 
+                onClose={() => setIsVideoCallModalOpen(false)} 
+                doctorName={selectedDoctor.name}
+            />}
+        </div>
+    );
 };
 
 export default App;

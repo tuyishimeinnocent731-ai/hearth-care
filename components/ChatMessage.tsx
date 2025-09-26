@@ -1,7 +1,6 @@
-// FIX: Create ChatMessage component
 import React from 'react';
 import type { Message, Doctor } from '../types';
-import { UserCircleIcon } from './IconComponents';
+import { UserCircleIcon, DocumentIcon } from './IconComponents';
 
 interface ChatMessageProps {
   message: Message;
@@ -38,10 +37,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, doctor }) => {
       >
         {message.attachment && (
             <div className="mb-2 max-w-xs">
-                {message.attachment.type === 'image' ? (
-                    <img src={message.attachment.data} alt="Attachment" className="rounded-lg w-full"/>
-                ) : (
-                    <video src={message.attachment.data} controls className="rounded-lg w-full"/>
+                {message.attachment.type === 'image' && <img src={message.attachment.url} alt="Attachment" className="rounded-lg w-full"/>}
+                {message.attachment.type === 'video' && <video src={message.attachment.url} controls className="rounded-lg w-full"/>}
+                {message.attachment.type === 'audio' && <audio src={message.attachment.url} controls className="w-full"/>}
+                {message.attachment.type === 'file' && (
+                    <a href={message.attachment.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-2 bg-gray-200 rounded-lg">
+                        <DocumentIcon className="w-6 h-6 mr-2 text-gray-600"/>
+                        <div>
+                            <p className="text-sm font-medium text-gray-800">{message.attachment.name}</p>
+                            <p className="text-xs text-gray-500">{message.attachment.size}</p>
+                        </div>
+                    </a>
                 )}
             </div>
         )}
