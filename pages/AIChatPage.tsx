@@ -265,7 +265,13 @@ const AIChatPage: React.FC = () => {
                 recognitionRef.current.start();
                 setIsRecording(true);
             } else {
-                alert("Ijwi ntiryemewe kuri iyi 'browser'. Gerageza Chrome cyangwa Edge.");
+                const browserSupportMessage: Message = {
+                  id: `error-no-support-${Date.now()}`,
+                  text: "[ICON:warning] Ijwi ntiryemewe kuri iyi 'browser' yawe. Gerageza gukoresha Chrome cyangwa Edge.",
+                  sender: 'system',
+                  timestamp: new Date().toISOString(),
+                };
+                setMessages(prev => [...prev, browserSupportMessage]);
             }
         }
     };
@@ -334,7 +340,7 @@ const AIChatPage: React.FC = () => {
                             type="text"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Andika ikibazo cyangwa uvuge..."
+                            placeholder={isRecording ? "Ndi kumva..." : "Andika ikibazo cyangwa uvuge..."}
                             className="flex-1 w-full py-3 pr-24 pl-4 bg-gray-100 border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                             disabled={isLoading}
                         />
