@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
-import type { Page, UserProfile } from '../types';
-import { SearchIcon, BellIcon, MenuIcon, XIcon } from './IconComponents';
+import React from 'react';
+import type { UserProfile, Page } from '../types';
+import { BellIcon, SearchIcon, SettingsIcon } from './IconComponents';
 
 interface HeaderProps {
     userProfile: UserProfile;
@@ -9,40 +8,27 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate }) => {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
     return (
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200">
-            <div className="mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center">
-                        <button className="lg:hidden mr-4 text-gray-600" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                             {mobileMenuOpen ? <XIcon className="w-6 h-6"/> : <MenuIcon className="w-6 h-6"/>}
-                        </button>
-                        <div className="relative hidden md:block">
-                            <input
-                                type="text"
-                                placeholder="Shakisha..."
-                                className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-full bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <SearchIcon className="h-5 w-5 text-gray-400" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                        <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700" onClick={() => onNavigate('notifications')}>
-                            <BellIcon className="w-6 h-6"/>
-                        </button>
-                        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => onNavigate('profile')}>
-                            <img src={userProfile.profilePicture} alt="User" className="w-9 h-9 rounded-full"/>
-                            <div className="hidden sm:block">
-                                <p className="text-sm font-semibold text-gray-800">{userProfile.fullName}</p>
-                                <p className="text-xs text-gray-500">Umurwayi</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <header className="flex-shrink-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-20">
+            <div className="flex items-center">
+                {/* This could be a search bar or page title */}
+            </div>
+            <div className="flex items-center gap-4">
+                <button className="text-gray-500 hover:text-gray-700">
+                    <SearchIcon className="w-5 h-5" />
+                </button>
+                <button onClick={() => onNavigate('notifications')} className="relative text-gray-500 hover:text-gray-700">
+                    <BellIcon className="w-6 h-6" />
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                </button>
+                 <button onClick={() => onNavigate('settings')} className="text-gray-500 hover:text-gray-700">
+                    <SettingsIcon className="w-6 h-6" />
+                </button>
+                <div className="w-px h-6 bg-gray-200" />
+                <button onClick={() => onNavigate('profile')} className="flex items-center gap-3">
+                    <span className="text-sm font-semibold hidden sm:inline">{userProfile.fullName}</span>
+                    <img src={userProfile.profilePicture} alt={userProfile.fullName} className="w-9 h-9 rounded-full"/>
+                </button>
             </div>
         </header>
     );

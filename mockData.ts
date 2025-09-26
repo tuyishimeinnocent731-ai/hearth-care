@@ -1,6 +1,33 @@
-
-import type { Prescription, UserProfile, Appointment, Conversation } from './types';
+import type { Appointment, Prescription, UserProfile, Conversation, HealthMetric, HealthGoal, Notification } from './types';
 import { DOCTORS } from './constants';
+import { HeartPulseIcon, DropletIcon, ActivityIcon, PillIcon } from './components/IconComponents';
+
+export const MOCK_APPOINTMENTS: Appointment[] = [
+  {
+    id: 1,
+    doctorName: 'Dr. Samuel Chen',
+    specialty: 'Ubuvuzi Rusange',
+    date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+    type: 'Video Call',
+    status: 'Upcoming',
+  },
+  {
+    id: 2,
+    doctorName: 'Dr. Evelyn Reed',
+    specialty: 'Umutima (Cardiologist)',
+    date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    type: 'Chat',
+    status: 'Upcoming',
+  },
+  {
+    id: 3,
+    doctorName: 'Dr. Ben Carter',
+    specialty: 'Abana (Pediatrician)',
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    type: 'Video Call',
+    status: 'Completed',
+  },
+];
 
 export const MOCK_PRESCRIPTIONS: Prescription[] = [
   {
@@ -8,31 +35,31 @@ export const MOCK_PRESCRIPTIONS: Prescription[] = [
     medication: 'Amoxicillin',
     dosage: '500mg',
     frequency: 'Inshuro 3 ku munsi',
-    dateIssued: '2023-10-15',
     doctorName: 'Dr. Samuel Chen',
-    refillsLeft: 1,
+    dateIssued: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'Active',
+    refillsLeft: 2,
   },
   {
     id: 2,
     medication: 'Ibuprofen',
     dosage: '200mg',
     frequency: 'Buri masaha 4-6',
-    dateIssued: '2023-09-20',
     doctorName: 'Dr. Ben Carter',
+    dateIssued: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'Active',
     refillsLeft: 0,
-    status: 'Inactive',
   },
-  {
+    {
     id: 3,
     medication: 'Lisinopril',
     dosage: '10mg',
     frequency: 'Inshuro 1 ku munsi',
-    dateIssued: '2023-05-01',
     doctorName: 'Dr. Evelyn Reed',
-    refillsLeft: 3,
-    status: 'Active',
-  },
+    dateIssued: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'Inactive',
+    refillsLeft: 0,
+  }
 ];
 
 export const MOCK_USER_PROFILE: UserProfile = {
@@ -49,7 +76,7 @@ export const MOCK_USER_PROFILE: UserProfile = {
   chronicConditions: ['Asthma'],
   pastSurgeries: ['Appendectomy (2015)'],
   emergencyContact: {
-    name: 'Gatete Jean',
+    name: 'Mugabo Jean',
     phone: '+250 788 654 321',
   },
   lifestyle: {
@@ -58,97 +85,55 @@ export const MOCK_USER_PROFILE: UserProfile = {
   },
 };
 
-export const MOCK_APPOINTMENTS: Appointment[] = [
-    {
-        id: 1,
-        doctorName: 'Dr. Samuel Chen',
-        specialty: 'Ubuvuzi Rusange',
-        date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-        type: 'Chat',
-        status: 'Upcoming',
-    },
-    {
-        id: 2,
-        doctorName: 'Dr. Evelyn Reed',
-        specialty: 'Umutima (Cardiologist)',
-        date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-        type: 'Video Call',
-        status: 'Upcoming',
-    },
-    {
-        id: 3,
-        doctorName: 'Dr. Ben Carter',
-        specialty: 'Abana (Pediatrician)',
-        date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        type: 'Chat',
-        status: 'Completed',
-    }
-];
-
 export const MOCK_CONVERSATIONS: Conversation[] = [
-    {
-        id: 1,
-        doctor: DOCTORS[0],
-        unread: 2,
-        messages: [
-            { id: '1a', text: "Muraho Dr. Reed, nashakaga kubaza ikibazo kijyanye n'umutima.", sender: 'user', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-            { id: '1b', text: "Muraho neza. Mumbwire, ikibazo cyanyu giteye gite?", sender: 'doctor', timestamp: new Date(Date.now() - 1.9 * 60 * 60 * 1000).toISOString() },
-            { id: '1c', text: "Ndumva umutima utera cyane mu gitondo.", sender: 'user', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
-            { id: '1d', text: "Ibyo bimenyetso byatangiye ryari?", sender: 'doctor', timestamp: new Date(Date.now() - 0.5 * 60 * 60 * 1000).toISOString() }
-        ],
-        isTyping: true,
-    },
-    {
-        id: 2,
-        doctor: DOCTORS[1],
-        unread: 0,
-        messages: [
-            { id: '2a', text: "Nabonye ibisubizo bya biriya bizamini?", sender: 'user', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: '2b', text: "Yego nabibonye, byose biri mu buryo.", sender: 'doctor', timestamp: new Date(Date.now() - 1.9 * 24 * 60 * 60 * 1000).toISOString() }
-        ]
-    },
-     {
-        id: 3,
-        doctor: DOCTORS[3],
-        unread: 0,
-        messages: [
-            { id: '3a', text: "Murakoze ku nama Dr. Carter. Umwana ameze neza ubu.", sender: 'user', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: '3b', text: "Nishimiye kubyumva! Muryoherwe n'umunsi.", sender: 'doctor', timestamp: new Date(Date.now() - 4.9 * 24 * 60 * 60 * 1000).toISOString() }
-        ]
-    }
-];
-
-export const MOCK_NOTIFICATIONS = [
   {
     id: 1,
-    title: 'Gahunda Yegereje',
-    message: "Gahunda yawe na Dr. Samuel Chen ni ejo saa 10:00 AM.",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    read: false,
-    category: 'appointment',
+    doctor: DOCTORS[0],
+    unread: 2,
+    isTyping: false,
+    messages: [
+      { id: '1', text: "Muraho Dr. Reed, mfite ikibazo cy'umutima.", sender: 'user', timestamp: new Date(Date.now() - 60000 * 20).toISOString() },
+      { id: '2', text: "Muraho, mbwira uko wumva umeze.", sender: 'doctor', timestamp: new Date(Date.now() - 60000 * 19).toISOString() },
+      { id: '3', text: "Nkumva umutima utera cyane kandi ndaremerewe mu gatuza.", sender: 'user', timestamp: new Date(Date.now() - 60000 * 5).toISOString() },
+      { id: '4', text: "Humura, reka dukore ibizamini. Byatangiye ryari?", sender: 'doctor', timestamp: new Date(Date.now() - 60000 * 4).toISOString() },
+    ],
   },
   {
     id: 2,
-    title: 'Ubutumwa Bushya',
-    message: "Dr. Evelyn Reed yakwandikiye ubutumwa.",
-    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    read: false,
-    category: 'message',
-  },
-  {
-    id: 3,
-    title: 'Imiti Yashyizweho',
-    message: "Dr. Ben Carter yongeye ku rutonde rw'imiti yawe.",
-    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    read: true,
-    category: 'prescription',
+    doctor: DOCTORS[1],
+    unread: 0,
+    isTyping: true,
+    messages: [
+      { id: '5', text: "Muraho neza Dr. Chen.", sender: 'user', timestamp: new Date(Date.now() - 60000 * 10).toISOString() },
+      { id: '6', text: "Muraho, niteguye kugufasha.", sender: 'doctor', timestamp: new Date(Date.now() - 60000 * 9).toISOString() },
+    ],
   },
    {
-    id: 4,
-    title: 'System Update',
-    message: "Twavuguruye porogaramu yacu kugira ngo ikorere neza kurushaho.",
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    read: true,
-    category: 'system',
-  },
+    id: 3,
+    doctor: DOCTORS[3],
+    unread: 0,
+    messages: [
+      { id: '7', text: "Dr. Carter, umwana wanjye afite umuriro.", sender: 'user', timestamp: new Date(Date.now() - 60000 * 60 * 24).toISOString() },
+      { id: '8', text: "Mwatanga amakuru arambuye? Afite imyaka ingahe?", sender: 'doctor', timestamp: new Date(Date.now() - 60000 * 60 * 23).toISOString() },
+    ],
+  }
+];
+
+export const MOCK_HEALTH_METRICS: HealthMetric[] = [
+    { id: 'heart_rate', name: 'Umuterere w\'Umutima', value: '72', unit: 'bpm', icon: HeartPulseIcon, trend: 'stable', target: '60-100 bpm' },
+    { id: 'blood_pressure', name: 'Umuvuduko w\'Amaraso', value: '120/80', unit: 'mmHg', icon: DropletIcon, trend: 'stable', target: '< 130/80 mmHg' },
+    { id: 'steps', name: 'Intambwe', value: '4,521', unit: '', icon: ActivityIcon, trend: 'up', target: '10,000' },
+    { id: 'medication', name: 'Imiti Yafashwe', value: '100', unit: '%', icon: PillIcon, trend: 'stable', target: '100%' },
+];
+
+export const MOCK_HEALTH_GOALS: HealthGoal[] = [
+    { id: 'water', name: 'Kunywa Amazi', progress: 75, target: '8 Ibirahuri', icon: DropletIcon, color: 'blue' },
+    { id: 'steps', name: 'Kugenda n\'amaguru', progress: 45, target: '10,000 Intambwe', icon: ActivityIcon, color: 'green' },
+];
+
+export const MOCK_NOTIFICATIONS: Notification[] = [
+    { id: 1, title: 'Gahunda Yegereje', description: 'Wibuke gahunda yawe na Dr. Samuel Chen saa 3:00 PM.', date: new Date().toISOString(), read: false, type: 'appointment' },
+    { id: 2, title: 'Ubutumwa bushya', description: 'Dr. Evelyn Reed yakwandikiye ubutumwa.', date: new Date(Date.now() - 3600000).toISOString(), read: false, type: 'message' },
+    { id: 3, title: 'Ongeresha Imiti', description: 'Imiti yawe ya Amoxicillin isigaje iminsi 2.', date: new Date(Date.now() - 3600000 * 5).toISOString(), read: true, type: 'prescription' },
+    { id: 4, title: 'Inama y\'ubuzima', description: 'Soma inama nshya ku kurwanya stress.', date: new Date(Date.now() - 3600000 * 24).toISOString(), read: true, type: 'general' },
 ];

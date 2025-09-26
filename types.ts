@@ -1,70 +1,46 @@
-
 export interface Doctor {
-    id: number;
-    name: string;
-    specialty: string;
-    imageUrl: string;
-    bio: string;
-    rating: number;
-    reviews: number;
-    consultationFee: number;
-    available: boolean;
-    languages: string[];
+  id: number;
+  name: string;
+  specialty: string;
+  imageUrl: string;
+  bio: string;
+  rating: number;
+  reviews: number;
+  consultationFee: number;
+  available: boolean;
+  languages: string[];
 }
 
 export interface Message {
-    id: string;
-    text: string;
-    sender: 'user' | 'doctor' | 'system';
-    timestamp: string;
-    attachment?: {
-        type: 'image' | 'video' | 'audio' | 'file';
-        url: string;
-        name?: string;
-        size?: string;
-    };
-    status?: 'sent' | 'delivered' | 'read';
+  id: string;
+  text: string;
+  sender: 'user' | 'doctor' | 'system';
+  timestamp: string;
+  attachment?: {
+    type: 'image' | 'video' | 'audio' | 'file';
+    url: string;
+    name?: string;
+    size?: string;
+  };
+  status?: 'sent' | 'delivered' | 'read';
 }
 
-export interface UserProfile {
-    fullName: string;
-    email: string;
-    phone: string;
-    dob: string;
-    location: string;
-    profilePicture: string;
-    height?: number;
-    weight?: number;
-    bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | 'N/A';
-    allergies: string[];
-    chronicConditions: string[];
-    pastSurgeries: string[];
-    emergencyContact: {
-        name: string;
-        phone: string;
-    };
-    lifestyle: {
-        smokingStatus: 'Not Specified' | 'Never' | 'Former' | 'Current';
-        alcoholConsumption: 'Not Specified' | 'None' | 'Occasional' | 'Regular';
-    };
-}
-
-export type Page =
-    | 'dashboard'
-    | 'consultation-start'
-    | 'symptom-form'
-    | 'payment'
-    | 'chat'
-    | 'summary'
-    | 'appointments'
-    | 'schedule-appointment'
-    | 'messages'
-    | 'prescriptions'
-    | 'profile'
-    | 'settings'
-    | 'notifications'
-    | 'video-consultation'
-    | 'ai-chat';
+export type Page = 
+  | 'doctor-selection'
+  | 'symptom-form'
+  | 'payment'
+  | 'chat'
+  | 'summary'
+  | 'dashboard'
+  | 'appointments'
+  | 'schedule-appointment'
+  | 'messages'
+  | 'prescriptions'
+  | 'profile'
+  | 'settings'
+  | 'notifications'
+  | 'video-consultation'
+  | 'ai-chat';
 
 export interface Appointment {
     id: number;
@@ -73,6 +49,29 @@ export interface Appointment {
     date: string;
     type: 'Video Call' | 'Chat';
     status: 'Upcoming' | 'Completed' | 'Cancelled';
+}
+
+export interface UserProfile {
+  fullName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  location: string;
+  profilePicture: string;
+  height?: number;
+  weight?: number;
+  bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | 'N/A';
+  allergies: string[];
+  chronicConditions: string[];
+  pastSurgeries: string[];
+  emergencyContact: {
+    name: string;
+    phone: string;
+  };
+  lifestyle: {
+    smokingStatus: 'Not Specified' | 'Never' | 'Former' | 'Current';
+    alcoholConsumption: 'Not Specified' | 'None' | 'Occasional' | 'Regular';
+  };
 }
 
 export interface Conversation {
@@ -88,17 +87,36 @@ export interface Prescription {
     medication: string;
     dosage: string;
     frequency: string;
-    dateIssued: string;
     doctorName: string;
-    refillsLeft: number;
+    dateIssued: string;
     status: 'Active' | 'Inactive';
+    refillsLeft: number;
+}
+
+export interface HealthMetric {
+    id: string;
+    name: string;
+    value: string;
+    unit: string;
+    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    trend: 'up' | 'down' | 'stable';
+    target: string;
+}
+
+export interface HealthGoal {
+    id: string;
+    name: string;
+    progress: number;
+    target: string;
+    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    color: string;
 }
 
 export interface Notification {
     id: number;
     title: string;
-    message: string;
-    timestamp: string;
+    description: string;
+    date: string;
     read: boolean;
-    category: 'appointment' | 'message' | 'system' | 'prescription';
+    type: 'appointment' | 'message' | 'prescription' | 'general';
 }

@@ -1,7 +1,4 @@
 {
   "name": "MediConnect AI - Ubuzima Bwawe",
-  "description": "Urwibutso rw'ubuvuzi rukoresha ubwenge bw'ubukorano rugufasha kuvugana na muganga w'AI, gusuzuma ibimenyetso byawe, no kwishyura serivisi z'ubujyanama.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "description": "Urwibutso rw'ubuvuzi rukoresha ubwenge bw'ubukorano rugufasha kuvugana na muganga w'AI, gusuzuma ibimenyetso byawe, no kwishyura serivisi z'ubujyanama."
 }

@@ -1,86 +1,63 @@
 import React from 'react';
 import type { Page } from '../types';
-import {
-  LayoutDashboardIcon,
-  MessageSquareIcon,
-  CalendarIcon,
-  PillIcon,
-  UserCircleIcon,
-  SettingsIcon,
-  BotIcon,
-  StethoscopeIcon,
-  VideoIcon
-} from './IconComponents';
+import { LayoutDashboardIcon, CalendarIcon, MessageSquareIcon, PillIcon, UserCircleIcon, SettingsIcon, BotIcon, HeartPulseIcon } from './IconComponents';
 
 interface LeftAsideProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
 }
 
-const NavLink: React.FC<{
-  icon: React.ReactNode;
+const NavItem: React.FC<{
+  page: Page;
   label: string;
-  isActive: boolean;
-  onClick: () => void;
-}> = ({ icon, label, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-      isActive
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
-    }`}
-  >
-    {icon}
-    <span className="ml-3">{label}</span>
-  </button>
+  icon: React.ReactNode;
+  currentPage: Page;
+  onNavigate: (page: Page) => void;
+}> = ({ page, label, icon, currentPage, onNavigate }) => (
+  <li>
+    <a
+      href="#"
+      onClick={(e) => { e.preventDefault(); onNavigate(page); }}
+      className={`flex items-center py-2.5 px-4 rounded-lg transition-colors duration-200 ${currentPage === page ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100'}`}
+    >
+      {icon}
+      <span className="ml-3 font-medium">{label}</span>
+    </a>
+  </li>
 );
 
 const LeftAside: React.FC<LeftAsideProps> = ({ currentPage, onNavigate }) => {
-  const navItems = [
-    { page: 'dashboard', label: 'Dashboard', icon: <LayoutDashboardIcon className="w-5 h-5" /> },
-    { page: 'consultation-start', label: 'Gisha Inama', icon: <StethoscopeIcon className="w-5 h-5" /> },
-    { page: 'ai-chat', label: 'Umujyanama wa AI', icon: <BotIcon className="w-5 h-5" /> },
-    { page: 'appointments', label: 'Gahunda Zanjye', icon: <CalendarIcon className="w-5 h-5" /> },
-    { page: 'messages', label: 'Ubutumwa', icon: <MessageSquareIcon className="w-5 h-5" /> },
-    { page: 'video-consultation', label: 'Video', icon: <VideoIcon className="w-5 h-5" /> },
-    { page: 'prescriptions', label: 'Imiti', icon: <PillIcon className="w-5 h-5" /> },
-  ];
-
-  const bottomNavItems = [
-    { page: 'profile', label: 'Umwirondoro', icon: <UserCircleIcon className="w-5 h-5" /> },
-    { page: 'settings', label: 'Igenamiterere', icon: <SettingsIcon className="w-5 h-5" /> },
-  ];
-
   return (
-    <aside className="hidden lg:block w-64 bg-white p-4 border-r border-gray-200 fixed top-0 left-0 h-screen">
-      <div className="flex items-center h-16 px-2 mb-4">
-        <h1 className="text-2xl font-bold text-blue-600">MediConnect</h1>
+    <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
+      <div className="h-16 flex items-center px-6">
+        <HeartPulseIcon className="w-8 h-8 text-blue-600" />
+        <h1 className="ml-2 text-xl font-bold text-gray-800">Ubuvuzi</h1>
       </div>
-      <nav className="flex flex-col h-[calc(100%-6rem)]">
-        <div className="space-y-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.page}
-              icon={item.icon}
-              label={item.label}
-              isActive={currentPage === item.page}
-              onClick={() => onNavigate(item.page as Page)}
-            />
-          ))}
-        </div>
-        <div className="mt-auto space-y-2">
-            {bottomNavItems.map((item) => (
-                <NavLink
-                key={item.page}
-                icon={item.icon}
-                label={item.label}
-                isActive={currentPage === item.page}
-                onClick={() => onNavigate(item.page as Page)}
-                />
-            ))}
+
+      <nav className="flex-1 px-4 py-4">
+        <ul className="space-y-2">
+          <NavItem page="dashboard" label="Imbonerahamwe" icon={<LayoutDashboardIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+          <NavItem page="appointments" label="Gahunda Zanjye" icon={<CalendarIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+          <NavItem page="messages" label="Ubutumwa" icon={<MessageSquareIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+          <NavItem page="prescriptions" label="Imiti" icon={<PillIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+          <NavItem page="ai-chat" label="Umujyanama AI" icon={<BotIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+        </ul>
+
+        <div className="mt-8 pt-4 border-t border-gray-200">
+          <ul className="space-y-2">
+            <NavItem page="profile" label="Umwirondoro" icon={<UserCircleIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+            <NavItem page="settings" label="Igenamiterere" icon={<SettingsIcon className="w-5 h-5" />} currentPage={currentPage} onNavigate={onNavigate} />
+          </ul>
         </div>
       </nav>
+      
+      <div className="p-4 mt-auto">
+        <div className="bg-blue-50 p-4 rounded-lg text-center">
+            <h4 className="font-bold text-blue-800">Gisha Inama Nshya</h4>
+            <p className="text-xs text-blue-700 mt-1 mb-3">Tangira ikiganiro gishya na muganga.</p>
+            <button onClick={() => onNavigate('doctor-selection')} className="w-full bg-blue-600 text-white text-sm font-semibold py-2 rounded-lg hover:bg-blue-700">Hitamo Muganga</button>
+        </div>
+      </div>
     </aside>
   );
 };

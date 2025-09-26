@@ -1,67 +1,95 @@
-
-import { GoogleGenAI, GenerateContentResponse, Part } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { Doctor, Message, UserProfile } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Note: API_KEY should be set in your environment variables.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+const model = "gemini-2.5-flash";
 
-const fileToGenerativePart = async (file: File): Promise<Part> => {
-  const base64EncodedDataPromise = new Promise<string>((resolve) => {
+const fileToGenerativePart = async (file: File) => {
+  const base64EncodedData = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
+    reader.onerror = (err) => reject(err);
     reader.readAsDataURL(file);
   });
   return {
     inlineData: {
-      data: await base64EncodedDataPromise,
       mimeType: file.type,
+      data: base64EncodedData,
     },
   };
 };
 
 export const sendSymptomDetails = async (
-  newMessage: string,
+  prompt: string,
   chatHistory: Message[],
   doctor: Doctor,
   file?: File | null
 ): Promise<string> => {
   try {
-    const model = 'gemini-2.5-flash';
+    const systemInstruction = `You are an AI medical assistant for Dr. ${doctor.name}, a ${doctor.specialty}.
+You are communicating with a patient in Kinyarwanda.
+Your goal is to be empathetic, professional, and clear.
+Based on the user's message and any attached image/video, ask clarifying questions to better understand their symptoms.
+Keep your responses concise, asking one or two questions at a time.
+Do not provide a diagnosis or medical advice. Defer to Dr. ${doctor.name} for that.
+Example: "Murakoze gusangira ayo makuru. Kugira ngo Dr. ${doctor.name} abashe kubafasha neza, mwasobanura niba hari ibindi bimenyetso mujya mwumva?"
+The user's language is Kinyarwanda. All your responses must be in Kinyarwanda.`;
 
-    const systemInstruction = `You are Dr. ${doctor.name}, a helpful, intelligent, and empathetic ${doctor.specialty}. 
-      Your user is communicating with you in Kinyarwanda. You MUST respond in Kinyarwanda.
-      - Your persona should match the doctor's bio: ${doctor.bio}.
-      - The user has already provided their initial symptoms. Your primary goal is to act as a world-class doctor and ask precise, clarifying follow-up questions to better understand their condition. 
-      - Analyze any provided images or videos for visual cues (e.g., redness, swelling, location of injury).
-      - Ask one or two critical questions at a time. For example: "Ibi bimenyetso byatangiye ryari?" or "Hari ikintu cyihariye gisa n'aho kibitera?".
-      - Provide brief, general advice if appropriate, but ALWAYS remind the user that this is a preliminary consultation and not a final medical diagnosis. Emphasize that they should see a doctor in person for serious issues.
-      - Maintain a professional, reassuring, and caring tone. Keep responses concise (2-4 sentences).`;
-    
-    const history = chatHistory.slice(0, -1).map(msg => ({ // Exclude the latest message which is the current prompt
-        role: msg.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }]
-    }));
-
-    const userParts: Part[] = [{ text: newMessage }];
+    const contents = [];
     if (file) {
       const imagePart = await fileToGenerativePart(file);
-      userParts.unshift(imagePart);
+      contents.push(imagePart);
     }
+    contents.push({ text: prompt });
 
-    // FIX: The `generateContent` API expects chat history to be part of the `contents` array, not a separate `history` property.
-    const fullContents = [...history, { role: 'user', parts: userParts }];
+    const response = await ai.models.generateContent({
+      model,
+      contents: { parts: contents },
+      config: {
+        systemInstruction,
+      },
+    });
+    
+    return response.text;
+  } catch (error) {
+    console.error("Gemini API error in sendSymptomDetails:", error);
+    throw new Error(
+      "An error occurred while communicating with the AI assistant."
+    );
+  }
+};
 
-    const response: GenerateContentResponse = await ai.models.generateContent({
-        model: model,
-        contents: fullContents,
-        config: {
-          systemInstruction: systemInstruction,
-        }
+export const generateConsultationSummary = async (
+  chatHistory: Message[],
+  doctor: Doctor
+): Promise<string> => {
+  try {
+    const conversation = chatHistory
+      .map((msg) => `${msg.sender === 'user' ? 'Patient' : `Dr. ${doctor.name}`}: ${msg.text}`)
+      .join("\n");
+
+    const prompt = `Please provide a structured summary of the following medical consultation in Kinyarwanda. Use markdown for formatting. The summary should include these sections:
+    1. **Iby'ingenzi ku murwayi:** (Patient's initial complaints)
+    2. **Ibivugwa na Muganga:** (Doctor's key questions and statements)
+    3. **Inama za Muganga:** (Doctor's final advice or next steps)
+    4. **Imiti yanditswe:** (Any prescribed medications)
+
+    Here is the conversation transcript:
+    ---
+    ${conversation}
+    ---
+    `;
+
+    const response = await ai.models.generateContent({
+        model,
+        contents: prompt
     });
 
     return response.text;
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    return "Tuvuganye n'ikibazo cya tekiniki. Mwihangane musubiremo nyuma.";
+    console.error("Gemini API error in generateConsultationSummary:", error);
+    throw new Error("Failed to generate consultation summary.");
   }
 };
 
@@ -72,81 +100,37 @@ export const getAIHealthAdvice = async (
   userProfile: UserProfile
 ): Promise<string> => {
   try {
-    const model = 'gemini-2.5-flash';
+    const systemInstruction = `You are a friendly and helpful AI health advisor for a digital health app in Rwanda.
+Your primary language for communication is Kinyarwanda.
+You provide general health information, wellness tips, and advice on healthy living.
+**You must never provide a medical diagnosis or prescribe medication.**
+If the user asks for a diagnosis or seems to be in an emergency, you must advise them to consult a real doctor immediately using the app.
+Use the user's profile information to personalize your advice where appropriate, but do not state their personal information back to them.
+You can use special tokens like [ICON:smile], [ICON:idea], [ICON:warning], [ICON:clipboard], [ICON:heart] to add visual cues.
 
-    const systemInstruction = `You are a highly intelligent, friendly, and helpful AI health advisor for a user in Rwanda. Your name is MediConnect AI. You MUST respond exclusively in Kinyarwanda.
-      
-      **Core Directives:**
-      1.  **Safety First:** You are NOT a doctor. You MUST NOT provide medical diagnoses, prescriptions, or specific treatment plans. Your primary role is to offer general, safe, and evidence-based health, wellness, and nutritional information.
-      2.  **Doctor Referral:** For any query that hints at a specific medical condition, symptom analysis, or request for diagnosis, your primary response should be to provide general information about the topic and STRONGLY, CLEARLY, and IMMEDIATELY recommend consulting a real human doctor.
-      3.  **Utilize User Profile for Context:** You have access to the user's health profile. Use this for context to make your advice more relevant, but NEVER mention their personal data directly. For example, if they have 'Asthma' and ask about exercise, you can provide general advice for asthmatics without saying "Because you have asthma...".
-      4.  **Structured & Clear Communication:** Use formatting to make your answers easy to read. Use numbered or bulleted lists (using •) for tips or steps. Use markdown bolding (**text**) to emphasize key points.
-      5.  **Use Icon Tokens:** Embed special tokens to make the chat interactive: [ICON:smile] for friendly encouragement, [ICON:idea] for tips, [ICON:warning] for important safety warnings, [ICON:clipboard] for summaries/lists, [ICON:heart] for wellness topics.
-      6.  **Image Analysis:** If an image is provided, analyze it at a high level (e.g., "I see a picture of a balanced meal.") but do not attempt to diagnose anything from it (e.g., "I see a skin rash..."). Refer to a doctor.
-
-      **User Profile Context:**
-      - Allergies: ${userProfile.allergies.join(', ') || 'Nta zizwi'}
-      - Chronic Conditions: ${userProfile.chronicConditions.join(', ') || 'Nta zizwi'}`;
-
-    const history = chatHistory.slice(0, -1).map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }]
-    }));
-
-    const userParts: Part[] = [{ text: prompt }];
+User Profile context:
+- Age based on DOB: ${userProfile.dob}
+- Chronic Conditions: ${userProfile.chronicConditions.join(', ') || 'None'}
+- Allergies: ${userProfile.allergies.join(', ') || 'None'}`;
+    
+    const contents = [];
     if (file) {
-      const imagePart = await fileToGenerativePart(file);
-      userParts.unshift(imagePart);
+      const filePart = await fileToGenerativePart(file);
+      contents.push(filePart);
     }
-    
-    // FIX: The `generateContent` API expects chat history to be part of the `contents` array, not a separate `history` property.
-    const fullContents = [...history, { role: 'user', parts: userParts }];
+    contents.push({ text: prompt });
 
-    const response: GenerateContentResponse = await ai.models.generateContent({
-        model: model,
-        contents: fullContents,
+    const response = await ai.models.generateContent({
+        model,
+        contents: { parts: contents },
         config: {
-            systemInstruction: systemInstruction,
-        }
+            systemInstruction
+        },
     });
-    
+
     return response.text;
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    return "[ICON:warning] Tuvuganye n'ikibazo cya tekiniki. Mwihangane musubiremo nyuma.";
+    console.error("Gemini API error in getAIHealthAdvice:", error);
+    throw new Error("An error occurred while communicating with the AI assistant.");
   }
-};
-
-export const generateConsultationSummary = async (chatHistory: Message[], doctor: Doctor): Promise<string> => {
-    try {
-        const model = 'gemini-2.5-flash';
-
-        const transcript = chatHistory
-            .filter(m => m.sender !== 'system')
-            .map(m => `${m.sender === 'user' ? 'Umurwayi' : 'Muganga'}: ${m.text}`)
-            .join('\n');
-        
-        const prompt = `You are a medical summarization expert. Based on the following consultation transcript between a patient and Dr. ${doctor.name}, generate a comprehensive yet easy-to-understand summary in Kinyarwanda. 
-
-        The summary MUST include the following sections, formatted clearly with markdown bold for the titles:
-        
-        1.  **Ibibazo By'ingenzi Byavuzweho:** The main symptoms or issues the patient described.
-        2.  **Inama z'Ibanze za Muganga:** The key advice, explanations, or recommendations given by the doctor.
-        3.  **Ingingo Zikurikira Zasabwe:** Any specific follow-up actions, tests, or lifestyle changes suggested by the doctor.
-        4.  **Ibibazo By'inyongera Ushobora Kubaza:** Based on the context, generate 2-3 intelligent follow-up questions the patient might want to ask in their next consultation to better understand their health. This adds significant value.
-
-        **Transcript:**
-        ${transcript}
-        `;
-
-        const response: GenerateContentResponse = await ai.models.generateContent({
-            model: model,
-            contents: prompt
-        });
-
-        return response.text;
-    } catch (error) {
-        console.error("Error generating summary:", error);
-        return "Ntibishoboye gukora incamake y'ikiganiro. Mwongere mugerageze.";
-    }
 };
