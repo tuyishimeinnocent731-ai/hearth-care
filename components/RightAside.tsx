@@ -1,5 +1,6 @@
 import React from 'react';
-import type { Page } from '../App';
+// FIX: The `Page` type is exported from `types.ts`, not `App.tsx`. Updated the import path.
+import type { Page } from '../types';
 import { CalendarIcon, UserIcon, HeartPulseIcon, PillIcon, ClockIcon, CheckCircleIcon, PlusCircleIcon } from './IconComponents';
 
 interface RightAsideProps {

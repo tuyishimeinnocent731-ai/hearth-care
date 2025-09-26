@@ -1,6 +1,5 @@
-
 import React from 'react';
-import type { Page } from '../App';
+import type { Page } from '../types';
 import {
   LayoutDashboardIcon,
   MessageSquareIcon,
@@ -11,11 +10,7 @@ import {
   BotIcon,
   StethoscopeIcon,
   VideoIcon
-} from './IconComponents'; // Assuming you have these icons
-
-// Renaming to avoid conflict with SVG element props
-const LayoutDashboard: React.FC<React.SVGProps<SVGSVGElement>> = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>
-const Settings: React.FC<React.SVGProps<SVGSVGElement>> = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2.23l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2.23l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+} from './IconComponents';
 
 interface LeftAsideProps {
   currentPage: Page;
@@ -43,7 +38,7 @@ const NavLink: React.FC<{
 
 const LeftAside: React.FC<LeftAsideProps> = ({ currentPage, onNavigate }) => {
   const navItems = [
-    { page: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { page: 'dashboard', label: 'Dashboard', icon: <LayoutDashboardIcon className="w-5 h-5" /> },
     { page: 'consultation-start', label: 'Gisha Inama', icon: <StethoscopeIcon className="w-5 h-5" /> },
     { page: 'ai-chat', label: 'Umujyanama wa AI', icon: <BotIcon className="w-5 h-5" /> },
     { page: 'appointments', label: 'Gahunda Zanjye', icon: <CalendarIcon className="w-5 h-5" /> },
@@ -54,7 +49,7 @@ const LeftAside: React.FC<LeftAsideProps> = ({ currentPage, onNavigate }) => {
 
   const bottomNavItems = [
     { page: 'profile', label: 'Umwirondoro', icon: <UserCircleIcon className="w-5 h-5" /> },
-    { page: 'settings', label: 'Igenamiterere', icon: <Settings className="w-5 h-5" /> },
+    { page: 'settings', label: 'Igenamiterere', icon: <SettingsIcon className="w-5 h-5" /> },
   ];
 
   return (

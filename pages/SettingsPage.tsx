@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BellIcon, ShieldCheckIcon } from '../components/IconComponents';
-import type { Page } from '../App';
+// FIX: The `Page` type is exported from `types.ts`, not `App.tsx`. Updated the import path.
+import type { Page } from '../types';
 
 interface ToggleSwitchProps {
     id: string;
