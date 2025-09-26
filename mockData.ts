@@ -1,100 +1,94 @@
-import type { Doctor } from './types';
 
-export const MOCK_APPOINTMENTS = [
-  {
-    id: 1,
-    doctorName: 'Dr. Samuel Chen',
-    specialty: 'Ubuvuzi Rusange',
-    date: '2024-08-15T15:00:00Z',
-    status: 'Upcoming',
-    type: 'Video Call'
-  },
-  {
-    id: 2,
-    doctorName: 'Dr. Isabella Monroe',
-    specialty: 'Uruhu (Dermatologist)',
-    date: '2024-07-28T11:30:00Z',
-    status: 'Completed',
-    type: 'Chat'
-  },
-   {
-    id: 3,
-    doctorName: 'Dr. Evelyn Reed',
-    specialty: 'Umutima (Cardiologist)',
-    date: '2024-07-20T09:00:00Z',
-    status: 'Completed',
-    type: 'Video Call'
-  },
-];
+import type { UserProfile, Appointment, Prescription } from './types';
 
-export const MOCK_PRESCRIPTIONS = [
-  {
-    id: 'p1',
-    medication: 'Amoxicillin 500mg',
-    dosage: '1 tablet',
-    frequency: 'Inshuro 3 ku munsi',
-    doctorName: 'Dr. Samuel Chen',
-    dateIssued: '2024-07-28',
-    refillsLeft: 0,
-    status: 'Active'
+export const MOCK_USER_PROFILE: UserProfile = {
+  fullName: 'Kamali Uwacu',
+  email: 'kamali.uwacu@example.com',
+  profilePicture: 'https://picsum.photos/seed/user1/200/200',
+  phone: '0788123456',
+  dob: '1990-05-15',
+  location: 'Kigali, Rwanda',
+  height: 175,
+  weight: 70,
+  bloodType: 'O+',
+  allergies: ['Penicillin', 'Peanuts'],
+  chronicConditions: ['Asthma'],
+  pastSurgeries: ['Appendectomy (2015)'],
+  emergencyContact: {
+    name: 'Gatete Chris',
+    phone: '0788654321',
   },
-  {
-    id: 'p2',
-    medication: 'Ibuprofen 200mg',
-    dosage: '2 tablets',
-    frequency: 'Buri masaha 6, iyo bibaye ngombwa',
-    doctorName: 'Dr. Julian Baker',
-    dateIssued: '2024-06-15',
-    refillsLeft: 2,
-    status: 'Active'
+  lifestyle: {
+    smokingStatus: 'Never',
+    alcoholConsumption: 'Occasional',
   },
-  {
-    id: 'p3',
-    medication: 'Lisinopril 10mg',
-    dosage: '1 tablet',
-    frequency: 'Inshuro 1 ku munsi',
-    doctorName: 'Dr. Evelyn Reed',
-    dateIssued: '2024-07-20',
-    refillsLeft: 1,
-    status: 'Active'
-  }
-];
+};
 
-export const MOCK_CONVERSATIONS = [
+export const MOCK_APPOINTMENTS: Appointment[] = [
     {
-        id: 'conv1',
-        doctor: {
-            id: 3,
-            name: 'Dr. Isabella Monroe',
-            specialty: 'Uruhu (Dermatologist)',
-            imageUrl: 'https://picsum.photos/seed/doc3/200/200',
-        },
-        lastMessage: "Yego, ukoreshe iyo miti hanyuma tuzongera kuvugana mu cyumweru kimwe.",
-        timestamp: "2024-07-28T12:05:00Z",
-        unreadCount: 0,
+        id: 1,
+        doctorName: 'Dr. Samuel Chen',
+        specialty: 'Ubuvuzi Rusange',
+        date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'Video Call',
+        status: 'Upcoming',
     },
     {
-        id: 'conv2',
-        doctor: {
-            id: 1,
-            name: 'Dr. Evelyn Reed',
-            specialty: 'Umutima (Cardiologist)',
-            imageUrl: 'https://picsum.photos/seed/doc1/200/200',
-        },
-        lastMessage: "Ndabona ibisubizo byawe. Reka mbisuzume neza.",
-        timestamp: "2024-07-20T09:30:00Z",
-        unreadCount: 0,
+        id: 2,
+        doctorName: 'Dr. Isabella Monroe',
+        specialty: 'Uruhu (Dermatologist)',
+        date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'Chat',
+        status: 'Upcoming',
     },
     {
-        id: 'conv3',
-        doctor: {
-            id: 4,
-            name: 'Dr. Julian Baker',
-            specialty: 'Abana (Pediatrician)',
-            imageUrl: 'https://picsum.photos/seed/doc4/200/200',
-        },
-        lastMessage: "Muraho, ni gute umwana ameze uyu munsi?",
-        timestamp: "2024-08-01T10:00:00Z",
-        unreadCount: 2,
+        id: 3,
+        doctorName: 'Dr. Evelyn Reed',
+        specialty: 'Umutima (Cardiologist)',
+        date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        type: 'Video Call',
+        status: 'Completed',
     }
-]
+];
+
+export const MOCK_PRESCRIPTIONS: Prescription[] = [
+    {
+        id: 1,
+        medication: 'Amoxicillin',
+        dosage: '500mg',
+        frequency: 'Twice a day',
+        doctorName: 'Dr. Samuel Chen',
+        dateIssued: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Active',
+        refillsLeft: 2,
+    },
+    {
+        id: 2,
+        medication: 'Ibuprofen',
+        dosage: '200mg',
+        frequency: 'As needed for pain',
+        doctorName: 'Dr. Ben Carter',
+        dateIssued: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Active',
+        refillsLeft: 0,
+    }
+];
+
+export const MOCK_MESSAGES_THREADS = [
+    {
+      id: 1,
+      doctorName: 'Dr. Isabella Monroe',
+      lastMessage: 'Yego, urakoze ku gisubizo. Nzagerageza...',
+      timestamp: '10:45 AM',
+      unread: 1,
+      imageUrl: 'https://picsum.photos/seed/doc3/200/200',
+    },
+    {
+      id: 2,
+      doctorName: 'Dr. Samuel Chen',
+      lastMessage: 'Urakoze cyane muganga. Ndumva meze neza.',
+      timestamp: 'Yesterday',
+      unread: 0,
+      imageUrl: 'https://picsum.photos/seed/doc2/200/200',
+    },
+];

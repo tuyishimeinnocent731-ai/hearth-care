@@ -1,4 +1,4 @@
-// FIX: Define and export interfaces for Doctor and Message
+
 export interface Doctor {
   id: number;
   name: string;
@@ -20,24 +20,16 @@ export interface Message {
   };
 }
 
-export interface ConsultationSummaryData {
-  symptoms: string;
-  diagnosis: string;
-  prescription: {
-    name: string;
-    dosage: string;
-    frequency: string;
-  }[];
-  advice: string;
-}
-
 export interface UserProfile {
   fullName: string;
   email: string;
+  profilePicture: string;
   phone: string;
-  dob: string;
+  dob: string; // YYYY-MM-DD
   location: string;
-  profilePicture: string; // URL
+  height?: number; // cm
+  weight?: number; // kg
+  bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | 'N/A';
   allergies: string[];
   chronicConditions: string[];
   pastSurgeries: string[];
@@ -46,7 +38,38 @@ export interface UserProfile {
     phone: string;
   };
   lifestyle: {
-    smokingStatus: 'Never' | 'Former' | 'Current' | 'Not Specified';
-    alcoholConsumption: 'None' | 'Occasional' | 'Regular' | 'Not Specified';
+    smokingStatus: 'Not Specified' | 'Never' | 'Former' | 'Current';
+    alcoholConsumption: 'Not Specified' | 'None' | 'Occasional' | 'Regular';
   };
+}
+
+export interface ConsultationSummaryData {
+  symptoms: string;
+  diagnosis: string;
+  prescription: Array<{
+    name: string;
+    dosage: string;
+    frequency: string;
+  }>;
+  advice: string;
+}
+
+export interface Appointment {
+  id: number;
+  doctorName: string;
+  specialty: string;
+  date: string; // ISO string
+  type: 'Video Call' | 'Chat';
+  status: 'Upcoming' | 'Completed' | 'Cancelled';
+}
+
+export interface Prescription {
+    id: number;
+    medication: string;
+    dosage: string;
+    frequency: string;
+    doctorName: string;
+    dateIssued: string; // ISO string
+    status: 'Active' | 'Inactive';
+    refillsLeft: number;
 }

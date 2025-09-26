@@ -1,10 +1,10 @@
 import React from 'react';
-import { HeartPulseIcon, CheckCircleIcon, ClockIcon } from '../components/IconComponents';
+import { HeartPulseIcon, CheckCircleIcon, ClockIcon, ArrowUpRightIcon } from '../components/IconComponents';
 
 const MetricCard = ({ title, value, unit, icon, colorClass }) => (
-    <div className="bg-white p-6 rounded-lg shadow-sm border">
+    <div className="bg-white p-6 rounded-xl shadow-sm border group transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
         <div className="flex items-center">
-            <div className={`p-3 rounded-full ${colorClass.bg}`}>
+            <div className={`p-3 rounded-full ${colorClass.bg} transition-all duration-300 group-hover:scale-110`}>
                 {React.cloneElement(icon, { className: `w-6 h-6 ${colorClass.text}` })}
             </div>
             <div className="ml-4">
@@ -14,9 +14,23 @@ const MetricCard = ({ title, value, unit, icon, colorClass }) => (
                 </p>
             </div>
         </div>
+        <div className="text-right mt-2">
+            <a href="#" className="text-xs font-medium text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end">
+                Reba Ibindi <ArrowUpRightIcon className="w-3 h-3 ml-1" />
+            </a>
+        </div>
     </div>
 );
 
+const stepsData = [
+    { day: 'L', steps: 8521, height: '60%' },
+    { day: 'T', steps: 11243, height: '80%' },
+    { day: 'W', steps: 9874, height: '75%' },
+    { day: 'T', steps: 4521, height: '45%' },
+    { day: 'F', steps: 12899, height: '90%' },
+    { day: 'S', steps: 5632, height: '50%' },
+    { day: 'S', steps: 9011, height: '65%' }
+];
 
 const HealthDashboardPage: React.FC = () => {
   return (
@@ -33,40 +47,23 @@ const HealthDashboardPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
             <h3 className="font-bold text-gray-800 mb-4">Intambwe z'icyumweru</h3>
             <div className="h-64 flex items-end justify-between space-x-2">
-                <div className="w-full text-center">
-                    <div className="bg-blue-500 mx-auto rounded-t-md" style={{height: '60%'}}></div>
-                    <p className="text-xs mt-1">L</p>
-                </div>
-                 <div className="w-full text-center">
-                    <div className="bg-blue-500 mx-auto rounded-t-md" style={{height: '80%'}}></div>
-                    <p className="text-xs mt-1">T</p>
-                </div>
-                 <div className="w-full text-center">
-                    <div className="bg-blue-500 mx-auto rounded-t-md" style={{height: '75%'}}></div>
-                    <p className="text-xs mt-1">W</p>
-                </div>
-                 <div className="w-full text-center">
-                    <div className="bg-blue-200 mx-auto rounded-t-md" style={{height: '45%'}}></div>
-                    <p className="text-xs mt-1">T</p>
-                </div>
-                 <div className="w-full text-center">
-                    <div className="bg-blue-500 mx-auto rounded-t-md" style={{height: '90%'}}></div>
-                    <p className="text-xs mt-1">F</p>
-                </div>
-                 <div className="w-full text-center">
-                    <div className="bg-blue-200 mx-auto rounded-t-md" style={{height: '50%'}}></div>
-                    <p className="text-xs mt-1">S</p>
-                </div>
-                 <div className="w-full text-center">
-                    <div className="bg-blue-200 mx-auto rounded-t-md" style={{height: '65%'}}></div>
-                    <p className="text-xs mt-1">S</p>
-                </div>
+                {stepsData.map(day => (
+                     <div key={day.day} className="w-full text-center group flex flex-col items-center justify-end h-full">
+                        <div className="relative w-full flex items-end justify-center" style={{height: day.height}}>
+                             <div className="absolute -top-7 text-xs font-bold text-white bg-gray-800 px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                {day.steps.toLocaleString('en-US')}
+                            </div>
+                            <div className="bg-blue-200 w-3/4 mx-auto rounded-t-md group-hover:bg-blue-500 transition-colors" style={{height: '100%'}}></div>
+                        </div>
+                        <p className="text-xs mt-1 text-gray-500">{day.day}</p>
+                    </div>
+                ))}
             </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
             <h3 className="font-bold text-gray-800 mb-4">Intego Z'ubuzima</h3>
             <div className="space-y-4">
                 <div>
