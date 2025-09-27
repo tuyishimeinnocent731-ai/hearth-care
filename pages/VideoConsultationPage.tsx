@@ -31,7 +31,7 @@ const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onSchedul
         {videoAppointments.length > 0 ? (
             <div className="space-y-4">
                 {videoAppointments.map(appt => (
-                    <div key={appt.id} className="p-4 border rounded-lg flex justify-between items-center">
+                    <div key={appt.id} className="p-4 border rounded-lg flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                         <div>
                             <p className="font-semibold text-gray-800">Video na {appt.doctorName}</p>
                             <p className="text-sm text-gray-500 flex items-center mt-1">
@@ -40,9 +40,9 @@ const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onSchedul
                             </p>
                         </div>
                         {appt.status === 'Upcoming' ? (
-                             <button className="text-sm bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Injira</button>
+                             <button className="w-full sm:w-auto text-sm bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Injira</button>
                         ) : (
-                             <span className="text-sm text-gray-400">Byarangiye</span>
+                             <span className="w-full sm:w-auto text-right text-sm text-gray-400">Byarangiye</span>
                         )}
                     </div>
                 ))}

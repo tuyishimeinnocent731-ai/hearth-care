@@ -17,7 +17,47 @@ const PrescriptionsPage: React.FC = () => {
         <p className="mt-2 text-lg text-gray-600">Reba urutonde rw'imiti wandikiwe n'abaganga.</p>
       </div>
       
-      <div className="bg-white rounded-lg shadow-sm border overflow-x-auto">
+      {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+          {MOCK_PRESCRIPTIONS.map(p => {
+              const isRequested = requestedRefills.includes(p.id);
+              return (
+                  <div key={p.id} className="bg-white rounded-lg shadow-sm border p-4 space-y-3">
+                      <div className="flex justify-between items-start">
+                          <div>
+                              <p className="font-bold text-gray-900">{p.medication}</p>
+                              <p className="text-sm text-gray-500">{p.dosage}, {p.frequency}</p>
+                          </div>
+                          <span className={`flex-shrink-0 inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ${p.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            <CheckCircleIcon className="w-3 h-3 mr-1.5"/>
+                            {p.status}
+                          </span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                          <p><span className="font-medium">Muganga:</span> {p.doctorName}</p>
+                          <p><span className="font-medium">Itariki:</span> {new Date(p.dateIssued).toLocaleDateString('rw-RW')}</p>
+                      </div>
+                      <div className="border-t pt-3">
+                          {p.refillsLeft > 0 ? (
+                              <button 
+                                  onClick={() => handleRequestRefill(p.id)}
+                                  disabled={isRequested}
+                                  className="w-full font-medium text-blue-600 flex items-center justify-center py-2 rounded-lg bg-blue-50 hover:bg-blue-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50"
+                              >
+                                  <RefreshCwIcon className={`w-4 h-4 mr-1.5 ${isRequested ? 'animate-spin' : ''}`}/>
+                                  {isRequested ? 'Byasabwe...' : `Ongeresha (${p.refillsLeft} ${p.refillsLeft > 1 ? 'bisigaye' : 'hasigaye'})`}
+                              </button>
+                          ) : (
+                                  <p className="text-sm text-center text-gray-500">Nta kongeresha gusigaye</p>
+                          )}
+                      </div>
+                  </div>
+              );
+          })}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white rounded-lg shadow-sm border overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-500">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
@@ -25,7 +65,7 @@ const PrescriptionsPage: React.FC = () => {
                     <th scope="col" className="px-6 py-3">Muganga</th>
                     <th scope="col" className="px-6 py-3">Itariki</th>
                     <th scope="col" className="px-6 py-3">Status</th>
-                    <th scope="col" className="px-6 py-3"></th>
+                    <th scope="col" className="px-6 py-3 text-right">Igikorwa</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,7 +80,7 @@ const PrescriptionsPage: React.FC = () => {
                             <td className="px-6 py-4">{p.doctorName}</td>
                             <td className="px-6 py-4">{new Date(p.dateIssued).toLocaleDateString('rw-RW')}</td>
                             <td className="px-6 py-4">
-                                <span className={`flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ${p.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                <span className={`inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ${p.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                     <CheckCircleIcon className="w-3 h-3 mr-1"/>
                                     {p.status}
                                 </span>
@@ -50,7 +90,7 @@ const PrescriptionsPage: React.FC = () => {
                                     <button 
                                         onClick={() => handleRequestRefill(p.id)}
                                         disabled={isRequested}
-                                        className="font-medium text-blue-600 hover:underline flex items-center disabled:text-gray-400 disabled:no-underline disabled:cursor-not-allowed"
+                                        className="font-medium text-blue-600 hover:underline flex items-center justify-end w-full disabled:text-gray-400 disabled:no-underline disabled:cursor-not-allowed"
                                     >
                                         <RefreshCwIcon className={`w-3 h-3 mr-1.5 ${isRequested ? 'animate-spin' : ''}`}/>
                                         {isRequested ? 'Byasabwe...' : `Ongeresha (${p.refillsLeft})`}

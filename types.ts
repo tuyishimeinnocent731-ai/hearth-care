@@ -1,3 +1,6 @@
+// FIX: Import React types to resolve 'Cannot find namespace React' error.
+import type { FC, SVGProps } from 'react';
+
 export interface Doctor {
   id: number;
   name: string;
@@ -98,7 +101,8 @@ export interface HealthMetric {
     name: string;
     value: string;
     unit: string;
-    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    // FIX: Use imported FC and SVGProps types.
+    icon: FC<SVGProps<SVGSVGElement>>;
     trend: 'up' | 'down' | 'stable';
     target: string;
 }
@@ -108,7 +112,8 @@ export interface HealthGoal {
     name: string;
     progress: number;
     target: string;
-    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    // FIX: Use imported FC and SVGProps types.
+    icon: FC<SVGProps<SVGSVGElement>>;
     color: string;
 }
 
