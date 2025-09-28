@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import type { Doctor } from '../types';
 import { DOCTORS } from '../constants';
@@ -13,7 +14,7 @@ const DoctorSelection: React.FC<DoctorSelectionProps> = ({ onSelectDoctor }) => 
     const [selectedDoctorProfile, setSelectedDoctorProfile] = useState<Doctor | null>(null);
 
     return (
-        <div className="p-6 md:p-8">
+        <div className="p-6 md:p-8 max-w-7xl mx-auto">
             <div className="mb-8 text-center">
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800">Hitamo Muganga</h1>
                 <p className="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">Hitamo mu baganga b'inzobere bemewe bahari kugira ngo bagufashe.</p>

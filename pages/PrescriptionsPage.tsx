@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { MOCK_PRESCRIPTIONS } from '../mockData';
-import { PillIcon, RefreshCwIcon, CheckCircleIcon } from '../components/IconComponents';
+import { PillIcon, RefreshCwIcon, CheckCircleIcon, InformationCircleIcon } from '../components/IconComponents';
+import type { Page } from '../types';
 
-const PrescriptionsPage: React.FC = () => {
+interface PrescriptionsPageProps {
+    onNavigate: (page: Page) => void;
+}
+
+const PrescriptionsPage: React.FC<PrescriptionsPageProps> = ({ onNavigate }) => {
     const [requestedRefills, setRequestedRefills] = useState<number[]>([]);
 
     const handleRequestRefill = (id: number) => {
@@ -11,10 +16,19 @@ const PrescriptionsPage: React.FC = () => {
     };
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Imiti Wandikiwe</h1>
-        <p className="mt-2 text-lg text-gray-600">Reba urutonde rw'imiti wandikiwe n'abaganga.</p>
+    <div className="p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 className="text-3xl font-bold text-gray-800">Imiti Wandikiwe</h1>
+            <p className="mt-2 text-lg text-gray-600">Reba urutonde rw'imiti wandikiwe n'abaganga.</p>
+        </div>
+        <button 
+            onClick={() => onNavigate('prescription-analysis')}
+            className="mt-4 md:mt-0 flex items-center px-5 py-2.5 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+            <InformationCircleIcon className="w-5 h-5 mr-2"/>
+            Tangira Isesengura
+        </button>
       </div>
       
       {/* Mobile View */}

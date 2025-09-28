@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import type { Doctor, Message, UserProfile } from "../types";
+import type { Doctor, Message, UserProfile, Appointment, Prescription } from "../types";
 
 // Note: API_KEY should be set in your environment variables.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
@@ -36,16 +36,17 @@ Do not provide a diagnosis or medical advice. Defer to Dr. ${doctor.name} for th
 Example: "Murakoze gusangira ayo makuru. Kugira ngo Dr. ${doctor.name} abashe kubafasha neza, mwasobanura niba hari ibindi bimenyetso mujya mwumva?"
 The user's language is Kinyarwanda. All your responses must be in Kinyarwanda.`;
 
-    const contents = [];
+    const parts = [];
     if (file) {
       const imagePart = await fileToGenerativePart(file);
-      contents.push(imagePart);
+      parts.push(imagePart);
     }
-    contents.push({ text: prompt });
+    parts.push({ text: prompt });
 
+    // FIX: Updated to use ai.models.generateContent and corrected contents structure.
     const response = await ai.models.generateContent({
       model,
-      contents: { parts: contents },
+      contents: { parts: parts },
       config: {
         systemInstruction,
       },
@@ -81,6 +82,7 @@ export const generateConsultationSummary = async (
     ---
     `;
 
+    // FIX: Updated to use ai.models.generateContent.
     const response = await ai.models.generateContent({
         model,
         contents: prompt
@@ -113,16 +115,17 @@ User Profile context:
 - Chronic Conditions: ${userProfile.chronicConditions.join(', ') || 'None'}
 - Allergies: ${userProfile.allergies.join(', ') || 'None'}`;
     
-    const contents = [];
+    const parts = [];
     if (file) {
       const filePart = await fileToGenerativePart(file);
-      contents.push(filePart);
+      parts.push(filePart);
     }
-    contents.push({ text: prompt });
+    parts.push({ text: prompt });
 
+    // FIX: Updated to use ai.models.generateContent and corrected contents structure.
     const response = await ai.models.generateContent({
         model,
-        contents: { parts: contents },
+        contents: { parts: parts },
         config: {
             systemInstruction
         },
@@ -133,4 +136,103 @@ User Profile context:
     console.error("Gemini API error in getAIHealthAdvice:", error);
     throw new Error("An error occurred while communicating with the AI assistant.");
   }
+};
+
+export const generateHealthReport = async (
+    userProfile: UserProfile,
+    appointments: Appointment[],
+    prescriptions: Prescription[]
+): Promise<string> => {
+    try {
+        const systemInstruction = `You are a helpful AI health analyst for a Rwandan digital health app. Your role is to analyze a user's health data and generate a clear, encouraging, and easy-to-understand health report in Kinyarwanda. You are NOT a doctor. You MUST NOT provide a medical diagnosis. Your goal is to summarize information and provide general wellness recommendations based on the data provided. Use markdown for structure and bolding.`;
+
+        const dob = new Date(userProfile.dob);
+        const age = new Date().getFullYear() - dob.getFullYear();
+
+        const prompt = `Please generate a personal health report in Kinyarwanda based on the following data:
+
+**User Profile:**
+- Age: ${age}
+- Chronic Conditions: ${userProfile.chronicConditions.join(', ') || 'Nta yo'}
+- Allergies: ${userProfile.allergies.join(', ') || 'Nta yo'}
+- Lifestyle: Smoking (${userProfile.lifestyle.smokingStatus}), Alcohol (${userProfile.lifestyle.alcoholConsumption})
+
+**Recent Appointments (${appointments.length}):**
+${appointments.map(a => `- ${new Date(a.date).toLocaleDateString('rw-RW')} na ${a.doctorName} (${a.specialty}), Statusi: ${a.status}`).join('\n')}
+
+**Active Prescriptions (${prescriptions.filter(p => p.status === 'Active').length}):**
+${prescriptions.filter(p => p.status === 'Active').map(p => `- ${p.medication} (${p.dosage}, ${p.frequency}) yanditswe na ${p.doctorName}`).join('\n')}
+
+---
+
+Based on this data, provide a report with the following markdown sections:
+### Incamake y'Ubuzima Bwawe
+(A brief, positive summary of the user's engagement with their health.)
+
+### Iby'ingenzi byavuye mu Isesengura
+(Key observations from the data, e.g., "Witabiriye gahunda zawe na muganga neza," or "Ufite imiti igenewe kugufasha kuri [condition].")
+
+### Inama zo Kwita ku Buzima Bwawe
+(Provide 2-3 actionable, general wellness tips. For example, "Komeza kunywa amazi ahagije" or "Gerageza gukora imyitozo ngororamubiri yoroheje.")
+
+### **Icyitonderwa cy'ingenzi**
+(A mandatory disclaimer: "Iyi raporo ni incamake ishingiye ku makuru watanze. Ntabwo isimbura inama za muganga. Mu gihe ufite ikibazo cy'ubuzima, ni byiza kugisha inama umuganga wabigize umwuga.")
+`;
+
+        // FIX: Updated to use ai.models.generateContent.
+        const response = await ai.models.generateContent({
+            model,
+            contents: prompt,
+            config: { systemInstruction },
+        });
+
+        return response.text;
+    } catch (error) {
+        console.error("Gemini API error in generateHealthReport:", error);
+        throw new Error("Failed to generate health report.");
+    }
+};
+
+export const analyzePrescriptions = async (prescriptions: Prescription[]): Promise<string> => {
+    try {
+        const systemInstruction = `You are a helpful AI medical assistant for a Rwandan health app. Your role is to analyze a list of prescriptions and explain them in simple, clear Kinyarwanda for a patient. You are NOT a doctor and you MUST NOT give medical advice that contradicts a doctor's orders. Your goal is to empower the patient with understanding. Use markdown for structure.`;
+        
+        const prescriptionList = prescriptions
+            .filter(p => p.status === 'Active')
+            .map(p => `- **${p.medication} (${p.dosage}, ${p.frequency})**: yanditswe na ${p.doctorName}`)
+            .join('\n');
+
+        if (prescriptions.filter(p => p.status === 'Active').length === 0) {
+            return "Nta miti ikoreshwa ifite isobanurwa muri iki gihe.";
+        }
+
+        const prompt = `Please analyze the following active prescriptions and provide a simple explanation for each in Kinyarwanda.
+
+**Imiti Ikoreshwa:**
+${prescriptionList}
+
+---
+
+For each medication, provide a response with the following markdown structure:
+### ${"Umuti_Amazina"}
+- **Iki Kiwukora:** (Explain in 1-2 simple sentences what this medication is generally used for. E.g., "Uyu muti ufasha kurwanya 'infections' ziterwa na 'bacteries'.")
+- **Inama Rusange:** (Provide 1-2 general, safe tips for taking it. E.g., "Ni byiza kuwufatana n'ifunguro kugira ngo wirinde ibibazo byo mu gifu." or "Nywa amazi menshi igihe urimo gufata uyu muti.")
+
+Finish with a mandatory and very important disclaimer section at the end:
+### **ICYITONDERWA CY'INGENZI**
+Aya makuru ni ayo kugufasha gusobanukirwa gusa. Ntabwo asimbura na gato inama wagiriwe na muganga wawe. Buri gihe ukurikize amabwiriza wahawe na muganga cyangwa farumasiye ku bijyanye n'imiti yawe.`;
+
+        // FIX: Updated to use ai.models.generateContent.
+        const response = await ai.models.generateContent({
+            model,
+            contents: prompt,
+            config: { systemInstruction },
+        });
+
+        return response.text;
+
+    } catch (error) {
+        console.error("Gemini API error in analyzePrescriptions:", error);
+        throw new Error("Failed to analyze prescriptions.");
+    }
 };

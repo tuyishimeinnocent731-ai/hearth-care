@@ -1,5 +1,6 @@
 import React from 'react';
-import { VideoIcon, PlusCircleIcon, CalendarIcon } from '../components/IconComponents';
+// FIX: Replaced missing icons with available ones
+import { VideoIcon, PlusIcon, CalendarDaysIcon } from '../components/IconComponents';
 import type { Appointment } from '../types';
 
 interface VideoConsultationPageProps {
@@ -11,7 +12,7 @@ const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onSchedul
     const videoAppointments = appointments.filter(a => a.type === 'Video Call');
 
   return (
-    <div className="p-6 md:p-8">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
             <h1 className="text-3xl font-bold text-gray-800">Ubujyanama kuri Video</h1>
@@ -21,7 +22,8 @@ const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onSchedul
             onClick={onScheduleCall}
             className="mt-4 md:mt-0 flex items-center px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-            <PlusCircleIcon className="w-5 h-5 mr-2"/>
+            {/* FIX: Replaced PlusCircleIcon with PlusIcon */}
+            <PlusIcon className="w-5 h-5 mr-2"/>
             Fata Gahunda Nshya
         </button>
       </div>
@@ -35,7 +37,8 @@ const VideoConsultationPage: React.FC<VideoConsultationPageProps> = ({ onSchedul
                         <div>
                             <p className="font-semibold text-gray-800">Video na {appt.doctorName}</p>
                             <p className="text-sm text-gray-500 flex items-center mt-1">
-                                <CalendarIcon className="w-4 h-4 mr-1.5"/>
+                                {/* FIX: Replaced CalendarIcon with CalendarDaysIcon */}
+                                <CalendarDaysIcon className="w-4 h-4 mr-1.5"/>
                                 {new Date(appt.date).toLocaleString('rw-RW', { dateStyle: 'medium', timeStyle: 'short' })}
                             </p>
                         </div>

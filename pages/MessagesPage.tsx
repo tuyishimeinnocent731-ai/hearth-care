@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Conversation, Message } from '../types';
-import { SearchIcon, ArrowLeftIcon, PlusIcon, SendIcon, MicrophoneIcon, ImageIcon, DocumentIcon, VideoIcon, SmileIcon, PlayIcon, CheckCheckIcon } from '../components/IconComponents';
+import { SearchIcon, ArrowLeftIcon, PlusIcon, SendIcon, MicrophoneIcon, ImageIcon, DocumentIcon, VideoIcon, SmileIcon, PlayIcon, CheckCheckIcon, XIcon } from '../components/IconComponents';
 import Spinner from '../components/Spinner';
 
 const ConversationList: React.FC<{
@@ -58,27 +58,57 @@ const ChatView: React.FC<{
 }> = ({ conversation, onBack, onSendMessage }) => {
     const [newMessage, setNewMessage] = useState('');
     const [attachmentMenuOpen, setAttachmentMenuOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [filePreview, setFilePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [conversation?.messages]);
+    
+    const removeFile = () => {
+        setSelectedFile(null);
+        if (filePreview) URL.revokeObjectURL(filePreview);
+        setFilePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            setSelectedFile(file);
+            setFilePreview(URL.createObjectURL(file));
+        }
+    };
 
     if (!conversation) {
         return <div className="hidden md:flex flex-1 items-center justify-center bg-gray-50 text-gray-500">Hitamo ikiganiro kugirango ugitangire.</div>;
     }
     
     const handleSend = () => {
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() && !selectedFile) return;
+
+        let attachment;
+        if (selectedFile && filePreview) {
+            attachment = {
+                type: 'image' as const,
+                url: filePreview,
+                file: selectedFile,
+            };
+        }
+
         const message: Message = {
             id: `user-${Date.now()}`,
             text: newMessage,
             sender: 'user',
             timestamp: new Date().toISOString(),
             status: 'sent',
+            attachment,
         };
         onSendMessage(conversation.id, message);
         setNewMessage('');
+        removeFile();
     };
 
     const lastMessage = conversation.messages[conversation.messages.length - 1];
@@ -102,15 +132,12 @@ const ChatView: React.FC<{
                 {conversation.messages.map((msg) => (
                     <div key={msg.id} className={`flex items-end gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                         {msg.sender === 'doctor' && <img src={conversation.doctor.imageUrl} className="w-8 h-8 rounded-full"/>}
-                         <div className={`group relative max-w-lg rounded-2xl ${msg.sender === 'user' ? 'bg-blue-600 text-white rounded-br-lg' : 'bg-white text-gray-800 rounded-bl-lg border'}`}>
-                           {/* Render Attachments etc. */}
-                           {msg.attachment?.type === 'image' && <img src={msg.attachment.url} className="p-1.5 rounded-2xl"/>}
-                           {msg.attachment?.type === 'audio' && <div className="p-3 flex items-center gap-2"><button><PlayIcon className="w-6 h-6"/></button> <span>{msg.attachment.size}</span></div> }
-                           {msg.text && <p className="p-3 text-sm">{msg.text}</p>}
-                           <div className="absolute top-1/2 -translate-y-1/2 -left-10 opacity-0 group-hover:opacity-100">
-                             <button className="p-1 rounded-full bg-white border shadow"><SmileIcon className="w-4 h-4 text-gray-500"/></button>
-                           </div>
-                        </div>
+                         <div className={`group relative max-w-lg rounded-2xl ${msg.sender === 'user' ? 'bg-blue-600 text-white rounded-br-lg' : 'bg-white text-gray-800 rounded-bl-lg border'} ${msg.attachment && !msg.text ? 'p-1.5' : 'p-3'}`}>
+                            {msg.attachment?.type === 'image' && (
+                                <img src={msg.attachment.url} className="rounded-xl max-w-xs" alt={msg.attachment.name || 'Image attachment'}/>
+                            )}
+                            {msg.text && <p className="text-sm">{msg.text}</p>}
+                         </div>
                     </div>
                 ))}
                  {conversation.isTyping && (
@@ -124,16 +151,24 @@ const ChatView: React.FC<{
 
             {/* Input */}
             <div className="p-4 bg-white border-t">
+                 {filePreview && (
+                    <div className="relative w-20 h-20 mb-2 p-1.5 border rounded-lg">
+                        <img src={filePreview} alt="Preview" className="w-full h-full object-cover rounded"/>
+                        <button onClick={removeFile} className="absolute -top-2 -right-2 bg-gray-700 text-white rounded-full p-0.5">
+                            <XIcon className="w-4 h-4"/>
+                        </button>
+                    </div>
+                )}
                 <div className="relative flex items-center">
                     <div className="relative">
                         <button onClick={() => setAttachmentMenuOpen(o => !o)} className="p-2 text-gray-500 hover:text-blue-600">
                             <PlusIcon className="w-6 h-6"/>
                         </button>
                         {attachmentMenuOpen && (
-                            <div className="absolute bottom-full mb-2 left-0 bg-white shadow-lg rounded-lg border p-2 flex gap-2">
-                                <button className="p-2 rounded-lg hover:bg-gray-100"><ImageIcon className="w-5 h-5 text-blue-600"/></button>
-                                <button className="p-2 rounded-lg hover:bg-gray-100"><DocumentIcon className="w-5 h-5 text-purple-600"/></button>
-                                <button className="p-2 rounded-lg hover:bg-gray-100"><VideoIcon className="w-5 h-5 text-green-600"/></button>
+                            <div className="absolute bottom-full mb-2 left-0 bg-white shadow-lg rounded-lg border p-1 flex gap-1">
+                                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden"/>
+                                <button onClick={() => {fileInputRef.current?.click(); setAttachmentMenuOpen(false);}} className="p-2 rounded-lg hover:bg-gray-100"><ImageIcon className="w-5 h-5 text-blue-600"/></button>
+                                <button className="p-2 rounded-lg hover:bg-gray-100" disabled><DocumentIcon className="w-5 h-5 text-purple-400"/></button>
                             </div>
                         )}
                     </div>
@@ -145,7 +180,7 @@ const ChatView: React.FC<{
                         placeholder="Andika ubutumwa..."
                         className="flex-1 w-full py-2 px-4 bg-gray-100 border-transparent rounded-full focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 mx-2"
                     />
-                    {newMessage ? (
+                    {newMessage || selectedFile ? (
                         <button onClick={handleSend} className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
                             <SendIcon className="w-6 h-6"/>
                         </button>

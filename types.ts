@@ -1,3 +1,4 @@
+
 // FIX: Import React types to resolve 'Cannot find namespace React' error.
 import type { FC, SVGProps } from 'react';
 
@@ -24,6 +25,7 @@ export interface Message {
     url: string;
     name?: string;
     size?: string;
+    file?: File;
   };
   status?: 'sent' | 'delivered' | 'read';
 }
@@ -43,7 +45,12 @@ export type Page =
   | 'settings'
   | 'notifications'
   | 'video-consultation'
-  | 'ai-chat';
+  | 'ai-chat'
+  | 'symptom-checker'
+  | 'health-report'
+  | 'prescription-analysis'
+  | 'live-consultation'
+  | 'appointment-summary';
 
 export interface Appointment {
     id: number;
@@ -52,6 +59,7 @@ export interface Appointment {
     date: string;
     type: 'Video Call' | 'Chat';
     status: 'Upcoming' | 'Completed' | 'Cancelled';
+    summaryNotes?: string;
 }
 
 export interface UserProfile {

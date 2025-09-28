@@ -1,6 +1,7 @@
+
 import type { Appointment, Prescription, UserProfile, Conversation, HealthMetric, HealthGoal, Notification } from './types';
 import { DOCTORS } from './constants';
-import { HeartPulseIcon, DropletIcon, ActivityIcon, PillIcon } from './components/IconComponents';
+import { HeartPulseIcon, DropletIcon, ActivityIcon, PillIcon, BedIcon, ZapIcon } from './components/IconComponents';
 
 export const MOCK_APPOINTMENTS: Appointment[] = [
   {
@@ -26,6 +27,7 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     type: 'Video Call',
     status: 'Completed',
+    summaryNotes: 'Patient presented with a mild fever and cough. Advised rest and hydration. Prescribed child-safe Ibuprofen for fever management. Follow-up advised if symptoms worsen after 3 days.'
   },
 ];
 
@@ -129,6 +131,8 @@ export const MOCK_HEALTH_METRICS: HealthMetric[] = [
 export const MOCK_HEALTH_GOALS: HealthGoal[] = [
     { id: 'water', name: 'Kunywa Amazi', progress: 75, target: '8 Ibirahuri', icon: DropletIcon, color: 'blue' },
     { id: 'steps', name: 'Kugenda n\'amaguru', progress: 45, target: '10,000 Intambwe', icon: ActivityIcon, color: 'green' },
+    { id: 'sleep', name: 'Gusinzira', progress: 88, target: 'Amasaha 8', icon: BedIcon, color: 'indigo' },
+    { id: 'exercise', name: 'Imyitozo Ngororamubiri', progress: 60, target: 'Iminota 30', icon: ZapIcon, color: 'yellow' },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [

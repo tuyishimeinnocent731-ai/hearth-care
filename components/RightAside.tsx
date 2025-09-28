@@ -1,7 +1,8 @@
 import React from 'react';
 // FIX: The `Page` type is exported from `types.ts`, not `App.tsx`. Updated the import path.
 import type { Page } from '../types';
-import { CalendarIcon, UserIcon, HeartPulseIcon, PillIcon, ClockIcon, CheckCircleIcon, PlusCircleIcon } from './IconComponents';
+// FIX: Replaced missing CalendarIcon and PlusCircleIcon with available icons.
+import { CalendarDaysIcon, UserIcon, HeartPulseIcon, PillIcon, ClockIcon, CheckCircleIcon, PlusIcon } from './IconComponents';
 
 interface RightAsideProps {
     onNavigate: (page: Page) => void;
@@ -9,8 +10,8 @@ interface RightAsideProps {
 
 const RightAside: React.FC<RightAsideProps> = ({ onNavigate }) => {
   return (
-    <aside className="hidden lg:block w-80 bg-gray-50 p-6 border-l border-gray-200 fixed top-0 right-0 h-screen overflow-y-auto">
-       <div className="h-16 flex items-center">
+    <aside className="hidden lg:flex w-80 flex-col bg-gray-50 p-6 border-l border-gray-200 overflow-y-auto">
+       <div className="h-16 flex-shrink-0 flex items-center">
         <h2 className="font-bold text-lg text-gray-800">Ibikorwa & Ibyibutswa</h2>
        </div>
       <div className="space-y-8">
@@ -20,7 +21,8 @@ const RightAside: React.FC<RightAsideProps> = ({ onNavigate }) => {
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 transition-shadow hover:shadow-md cursor-pointer" onClick={() => onNavigate('appointments')}>
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-full">
-                        <CalendarIcon className="w-5 h-5 text-blue-600"/>
+                        {/* FIX: Replaced CalendarIcon with CalendarDaysIcon */}
+                        <CalendarDaysIcon className="w-5 h-5 text-blue-600"/>
                     </div>
                     <div>
                         <p className="text-sm font-semibold text-gray-800">Dr. Samuel Chen</p>
@@ -80,8 +82,10 @@ const RightAside: React.FC<RightAsideProps> = ({ onNavigate }) => {
         <div>
           <h3 className="font-bold text-gray-800 mb-4">Ibikorwa byihuse</h3>
            <div className="grid grid-cols-2 gap-3">
-               <button onClick={() => onNavigate('appointments')} className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50 hover:border-blue-400 transition-colors duration-200">
-                   <PlusCircleIcon className="w-6 h-6 text-blue-600 mb-1"/>
+               {/* FIX: Corrected navigation to 'schedule-appointment' for better UX */}
+               <button onClick={() => onNavigate('schedule-appointment')} className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50 hover:border-blue-400 transition-colors duration-200">
+                   {/* FIX: Replaced PlusCircleIcon with PlusIcon */}
+                   <PlusIcon className="w-6 h-6 text-blue-600 mb-1"/>
                    <p className="text-xs font-semibold text-gray-700">Gufata Gahunda</p>
                </button>
                 <button onClick={() => onNavigate('prescriptions')} className="flex flex-col items-center justify-center bg-white p-3 rounded-lg text-center border hover:bg-gray-50 hover:border-green-400 transition-colors duration-200">

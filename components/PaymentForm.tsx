@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import type { Doctor } from '../types';
-import { CreditCardIcon, LockIcon, CalendarIcon, ShieldCheckIcon, UserIcon } from './IconComponents';
+// FIX: Replaced missing CalendarIcon with CalendarDaysIcon
+import { CreditCardIcon, LockIcon, CalendarDaysIcon, ShieldCheckIcon, UserIcon } from './IconComponents';
 import Spinner from './Spinner';
 
 interface PaymentFormProps {
@@ -59,7 +60,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ doctor, onPaymentSuccess }) =
   const totalAmount = doctor.consultationFee + processingFee;
 
   return (
-    <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
+    <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
         <div className="lg:w-1/2">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Uzuza Ubwishyu Bwawe</h2>
             <p className="text-gray-600 mb-6">Ishyura mu mutekano ubujyanama bwawe na Dr. {doctor.name}.</p>
@@ -114,7 +115,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ doctor, onPaymentSuccess }) =
                         <label htmlFor="expiry" className="block text-sm font-medium text-gray-700">Igihe Izarangirira</label>
                          <div className="mt-1 relative rounded-md shadow-sm">
                              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                {/* FIX: Replaced missing CalendarIcon with CalendarDaysIcon */}
+                                <CalendarDaysIcon className="h-5 w-5 text-gray-400" />
                             </div>
                             <input type="text" id="expiry" value={cardData.expiry} onChange={handleChange} className={`block w-full rounded-md border-gray-300 pl-10 sm:text-sm p-2.5 ${errors.expiry ? 'border-red-500' : 'focus:border-blue-500 focus:ring-blue-500'}`} placeholder="UK / UM" />
                          </div>

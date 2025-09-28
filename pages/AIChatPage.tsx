@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Message, UserProfile } from '../types';
-import { BotIcon, SendIcon, UserCircleIcon, LightbulbIcon, AlertTriangleIcon, SmileIcon, ClipboardCheckIcon, HeartPulseIcon, ClipboardIcon, CheckIcon, PaperclipIcon, XIcon, MicrophoneIcon, VideoIcon } from '../components/IconComponents';
+// FIX: Replaced missing BotIcon with SparklesIcon
+import { SparklesIcon, SendIcon, UserCircleIcon, LightbulbIcon, AlertTriangleIcon, SmileIcon, ClipboardCheckIcon, HeartPulseIcon, ClipboardIcon, CheckIcon, PaperclipIcon, XIcon, MicrophoneIcon, VideoIcon } from '../components/IconComponents';
 import Spinner from '../components/Spinner';
 import { getAIHealthAdvice } from '../services/geminiService';
 
@@ -54,7 +55,8 @@ const AIChatMessage: React.FC<{ message: Message }> = ({ message }) => {
         <div className={`flex items-start gap-3 ${isUser ? 'justify-end' : ''}`}>
             {!isUser && (
                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <BotIcon className="w-6 h-6 text-blue-600" />
+                    {/* FIX: Replaced missing BotIcon with SparklesIcon */}
+                    <SparklesIcon className="w-6 h-6 text-blue-600" />
                 </div>
             )}
             <div className="group relative">
@@ -112,7 +114,8 @@ const SuggestedPrompts: React.FC<{ onPromptClick: (prompt: string) => void }> = 
 
     return (
         <div className="flex-1 flex flex-col justify-center items-center text-center p-4">
-            <BotIcon className="w-16 h-16 text-gray-300 mb-4" />
+            {/* FIX: Replaced missing BotIcon with SparklesIcon */}
+            <SparklesIcon className="w-16 h-16 text-gray-300 mb-4" />
             <h2 className="text-3xl font-extrabold text-gray-800">Umujyanama wa AI</h2>
             <p className="text-gray-500 mt-2 mb-6 max-w-md">Nshobora kugufasha n'inama z'ubuzima rusange. Baza ikibazo cyangwa uhitemo mu byifuzo bikurikira.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
@@ -205,17 +208,10 @@ const AIChatPage: React.FC<AIChatPageProps> = ({ userProfile }) => {
         const fileToSend = selectedFile;
 
         if (fileToSend) {
-            attachmentData = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    // FIX: Corrected the attachment object property from 'data' to 'url' to match the 'Message' type definition, resolving the property error.
-                    resolve({
-                        type: fileToSend.type.startsWith('image/') ? 'image' : 'video',
-                        url: reader.result as string,
-                    });
-                };
-                reader.readAsDataURL(fileToSend);
-            });
+            attachmentData = {
+                type: fileToSend.type.startsWith('image/') ? 'image' : 'video',
+                url: URL.createObjectURL(fileToSend),
+            };
         }
         
         const userMessage: Message = {
@@ -286,7 +282,8 @@ const AIChatPage: React.FC<AIChatPageProps> = ({ userProfile }) => {
             <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white shadow-sm z-10">
                  <div className="flex items-center">
                     <div className="relative">
-                        <BotIcon className="w-10 h-10 text-blue-600" />
+                        {/* FIX: Replaced missing BotIcon with SparklesIcon */}
+                        <SparklesIcon className="w-10 h-10 text-blue-600" />
                         <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white"></span>
                     </div>
                     <div className="ml-4">
@@ -304,7 +301,8 @@ const AIChatPage: React.FC<AIChatPageProps> = ({ userProfile }) => {
                 {isLoading && (
                     <div className="flex items-start space-x-3">
                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                           <BotIcon className="w-6 h-6 text-blue-600" />
+                           {/* FIX: Replaced missing BotIcon with SparklesIcon */}
+                           <SparklesIcon className="w-6 h-6 text-blue-600" />
                         </div>
                         <div className="p-4 bg-white rounded-2xl rounded-bl-lg border border-gray-100 shadow-md">
                             <Spinner />

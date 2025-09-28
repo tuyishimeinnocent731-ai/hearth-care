@@ -1,17 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { Doctor } from '../types';
 import { PaperclipIcon, XIcon, VideoIcon } from '../components/IconComponents';
 
 interface SymptomFormPageProps {
     doctor: Doctor | null;
     onSubmit: (details: { text: string; file?: File }) => void;
+    initialSymptoms?: string | null;
 }
 
-const SymptomFormPage: React.FC<SymptomFormPageProps> = ({ doctor, onSubmit }) => {
+const SymptomFormPage: React.FC<SymptomFormPageProps> = ({ doctor, onSubmit, initialSymptoms }) => {
     const [symptoms, setSymptoms] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [filePreview, setFilePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    useEffect(() => {
+        if (initialSymptoms) {
+            setSymptoms(initialSymptoms);
+        }
+    }, [initialSymptoms]);
 
     if (!doctor) return <div className="p-8 text-center">Muganga ntiyatoranijwe. Subira inyuma uhitemo.</div>;
 
@@ -51,7 +58,7 @@ const SymptomFormPage: React.FC<SymptomFormPageProps> = ({ doctor, onSubmit }) =
                     </label>
                     <textarea
                         id="symptoms"
-                        rows={6}
+                        rows={8}
                         value={symptoms}
                         onChange={(e) => setSymptoms(e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

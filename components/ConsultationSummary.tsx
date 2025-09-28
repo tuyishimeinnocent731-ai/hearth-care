@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import type { Doctor, Message } from '../types';
 import Spinner from './Spinner';
@@ -9,9 +10,10 @@ interface ConsultationSummaryProps {
   doctor: Doctor | null;
   chatHistory: Message[];
   onStartNewConsultation: () => void;
+  onShowToast: (message: string) => void;
 }
 
-const ConsultationSummary: React.FC<ConsultationSummaryProps> = ({ doctor, chatHistory, onStartNewConsultation }) => {
+const ConsultationSummary: React.FC<ConsultationSummaryProps> = ({ doctor, chatHistory, onStartNewConsultation, onShowToast }) => {
     const [summary, setSummary] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
@@ -50,7 +52,8 @@ const ConsultationSummary: React.FC<ConsultationSummaryProps> = ({ doctor, chatH
                     <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
                         {summary.split('\n').map((line, index) => {
                              if (line.match(/^\*\*.*\*\*$/)) {
-                                return <h4 key={index} className="font-bold mt-3">{line.replaceAll('**', '')}</h4>
+                                // FIX: Property 'replaceAll' does not exist on type 'string'. Using replace with a global regex for compatibility.
+                                return <h4 key={index} className="font-bold mt-3">{line.replace(/\*\*/g, '')}</h4>
                             }
                             if (line.trim() === '') return null;
                             return <p key={index}>{line}</p>
@@ -67,7 +70,10 @@ const ConsultationSummary: React.FC<ConsultationSummaryProps> = ({ doctor, chatH
             >
               Gisha Inama Nshya
             </button>
-             <button className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg border hover:bg-gray-200">
+             <button 
+                onClick={() => onShowToast("Incamake yoherejwe kuri email yawe!")}
+                className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg border hover:bg-gray-200"
+            >
                 Ohereza kuri Email
             </button>
         </div>

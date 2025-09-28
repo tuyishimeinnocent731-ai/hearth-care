@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Appointment, Doctor } from '../types';
-import { CalendarIcon, ClockIcon } from '../components/IconComponents';
+// FIX: Replaced missing CalendarIcon with CalendarDaysIcon
+import { CalendarDaysIcon, ClockIcon } from '../components/IconComponents';
 
 interface ScheduleAppointmentPageProps {
   onSchedule: (appointment: Appointment) => void;
@@ -57,7 +58,8 @@ const ScheduleAppointmentPage: React.FC<ScheduleAppointmentPageProps> = ({ onSch
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                              <div>
-                                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1 flex items-center"><CalendarIcon className="w-4 h-4 mr-2"/> Itariki</label>
+                                {/* FIX: Replaced missing CalendarIcon with CalendarDaysIcon */}
+                                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1 flex items-center"><CalendarDaysIcon className="w-4 h-4 mr-2"/> Itariki</label>
                                 <input type="date" id="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
                                     className="w-full p-2 border rounded-md" />
                             </div>
